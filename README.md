@@ -45,3 +45,8 @@ import OrgChart from "awesome-react-org-chart";
   )}
 />;
 ```
+
+## Credits
+
+[OrgChart](https://github.com/romanpolunin/OrgChart) by [@romanpolunin](https://github.com/romanpolunin)
+
