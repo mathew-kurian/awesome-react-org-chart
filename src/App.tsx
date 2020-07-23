@@ -93,7 +93,7 @@ export default class App extends Component<
           <OrgChart
             root={nodes[0]}
             keyGetter={(node) => String(node.id)}
-            childNodeGetter={(node) =>
+            childNodesGetter={(node) =>
               node.children
                 // @ts-ignore
                 .map((id: string | number) =>

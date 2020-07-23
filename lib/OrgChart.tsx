@@ -32,7 +32,7 @@ interface OrgChartProps<T> {
   layout?: LayoutType;
   containerStyle?: React.CSSProperties;
   keyGetter: (node: T) => string;
-  childNodeGetter: (node: T) => T[];
+  childNodesGetter: (node: T) => T[];
   sizeGetter: (
     node: T,
     domElement: HTMLDivElement,
@@ -111,13 +111,13 @@ export default class OrgChart<T> extends React.Component<OrgChartProps<T>> {
   computeItems(root: T): any[] {
     const dataItems: any[] = [];
 
-    const { childNodeGetter, keyGetter } = this.props;
+    const { childNodesGetter, keyGetter } = this.props;
 
     const processNode = (node: T, parentKey: string | null) => {
       const key = keyGetter(node);
       dataItems.push(TreeChartLayout.createDataItem(key, parentKey, node));
 
-      for (const childNode of childNodeGetter(node)) {
+      for (const childNode of childNodesGetter(node)) {
         processNode(childNode, key);
       }
     };

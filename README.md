@@ -16,7 +16,7 @@ import OrgChart from "awesome-react-org-chart";
 <OrgChart
   root={nodes[0]}
   keyGetter={(node) => String(node.id)}
-  childNodeGetter={(node) =>
+  childNodesGetter={(node) =>
     node.children
       // @ts-ignore
       .map((id: string | number) => nodes.find((node) => node.id === id))
@@ -49,4 +49,3 @@ import OrgChart from "awesome-react-org-chart";
 ## Credits
 
 [OrgChart](https://github.com/romanpolunin/OrgChart) by [@romanpolunin](https://github.com/romanpolunin)
-
