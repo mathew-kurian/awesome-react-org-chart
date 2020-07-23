@@ -4,9 +4,9 @@
   "description": "Renders large organization charts with multiple compaction/packing techniques to improve readability and accessibility.",
   "main": "./dist/OrgChart.js",
   "typings": "./dist/OrgChart.d.ts",
-  "dependencies": {
-    "react": "^15",
-    "react-dom": "^15"
+  "peerDependencies": {
+    "react": ">=15",
+    "react-dom": ">=15"
   },
   "files": [
     "dist"
@@ -39,6 +39,8 @@
   },
   "homepage": "https://github.com/mathew-kurian/awesome-react-org-chart#readme",
   "devDependencies": {
+    "react": "latest",
+    "react-dom": "latest",
     "express": "^4.17.1",
     "@babel/core": "^7.10.5",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
