@@ -12,7 +12,7 @@ export type LayoutType =
   | "singleColumnLeft"
   | "stackers";
 
-export interface TreeChartLayoutRawRenderProps<T> {
+export interface TreeChartLayoutRenderCallbackProps<T> {
   data: T;
   size: { width: number; height: number };
   setCollapsed: (collapsed: boolean) => void;
@@ -22,8 +22,8 @@ export interface TreeChartLayoutRawRenderProps<T> {
   level: number;
 }
 
-export type TreeChartLayoutRenderProps<T> = Omit<
-  TreeChartLayoutRawRenderProps<T>,
+export type LayoutRenderProps<T> = Omit<
+  TreeChartLayoutRenderCallbackProps<T>,
   "data"
 >;
 
@@ -38,10 +38,7 @@ interface OrgChartProps<T> {
     domElement: HTMLDivElement,
     reactElement: React.ReactElement
   ) => { width: number; height: number };
-  renderNode: (
-    node: T,
-    props: TreeChartLayoutRenderProps<T>
-  ) => React.ReactElement;
+  renderNode: (node: T, props: LayoutRenderProps<T>) => React.ReactElement;
   connectorVerticalStyle?: React.CSSProperties;
   connectorHorizontalStyle?: React.CSSProperties;
   connectorVerticalClassName?: string;
@@ -100,7 +97,7 @@ export default class OrgChart<T> extends React.Component<OrgChartProps<T>> {
       siblingSpacing,
       renderCallback: (
         node: HTMLDivElement,
-        props: TreeChartLayoutRawRenderProps<T>
+        props: TreeChartLayoutRenderCallbackProps<T>
       ) => this.renderNode(node, props),
     });
 
@@ -197,7 +194,7 @@ export default class OrgChart<T> extends React.Component<OrgChartProps<T>> {
 
   renderNode(
     domNode: HTMLDivElement,
-    props: TreeChartLayoutRawRenderProps<T>
+    props: TreeChartLayoutRenderCallbackProps<T>
   ): { width: number; height: number } {
     const { sizeGetter } = this.props;
     const { data: node, ...otherProps } = props;
