@@ -1,0 +1,66 @@
+{
+  "name": "awesome-react-org-chart",
+  "version": "0.0.0-semantic-release",
+  "description": "Library to render ",
+  "main": "dist/OrgChart.js",
+  "dependencies": {
+    "react": "^15",
+    "react-dom": "^15"
+  },
+  "files": [
+    "lib"
+  ],
+  "keywords": [
+    "awesome",
+    "react",
+    "org",
+    "chart",
+    "pack",
+    "packing",
+    "compact",
+    "compaction"
+  ],
+  "scripts": {
+    "start": "node register.js",
+    "build": "export NODE_ENV=production; npx webpack --config webpack.config.js; npm run build-lib",
+    "watch": "export NODE_ENV=development; npx webpack --config webpack.config.js",
+    "build-lib": "export NODE_ENV=production; npx tsc",
+    "watch-lib": "export NODE_ENV=development; npx tsc-watch"
+  },
+  "author": "Mathew Kurian",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/mathew-kurian/awesome-react-org-chart.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mathew-kurian/awesome-react-org-chart/issues"
+  },
+  "homepage": "https://github.com/mathew-kurian/awesome-react-org-chart#readme",
+  "devDependencies": {
+    "express": "^4.17.1",
+    "@babel/core": "^7.10.5",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-proposal-decorators": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-react": "^7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
+    "@babel/register": "^7.10.5",
+    "@types/compression": "^1.7.0",
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.7",
+    "@types/node": "^14.0.23",
+    "@types/react": "^16.9.43",
+    "@types/react-dom": "^16.9.8",
+    "awesome-esbuild-loader": "^1.0.2",
+    "babel-loader": "^8.1.0",
+    "bootstrap": "^4.5.0",
+    "css-loader": "^3.6.0",
+    "fork-ts-checker-webpack-plugin": "^5.0.7",
+    "react-bootstrap": "^1.2.2",
+    "style-loader": "^1.2.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

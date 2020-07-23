@@ -1,0 +1,5 @@
+public/scripts/
+node_modules/
+.DS_Store
+*.log
+thumbs.db

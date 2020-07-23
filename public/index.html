@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>React OrgChart</title>
+    <meta charset="utf-8" />
+    <script src="/scripts/jquery.min.js"></script>
+    <script src="/scripts/bundle.js"></script>
+    <style>
+      .expander {
+        z-index: 2;
+        position: absolute;
+        border: none;
+        background-color: none;
+        font-size: smaller;
+        width: 10px;
+        height: 10px;
+        text-align: center;
+        margin: 0px;
+        color: red;
+      }
+
+      .chartBoxTop {
+        z-index: 1;
+        position: absolute;
+        border: thin solid #000000;
+        background-color: yellow;
+        font-size: x-small;
+        text-align: center;
+      }
+
+      .chartBoxMiddle {
+        z-index: 1;
+        position: absolute;
+        border: thin solid #000000;
+        background-color: whitesmoke;
+        font-size: x-small;
+        text-align: center;
+      }
+
+      .chartBoxLower {
+        z-index: 1;
+        position: absolute;
+        border: thin solid #000000;
+        background-color: lemonchiffon;
+        font-size: x-small;
+        text-align: center;
+      }
+
+      .chartBoxLowest {
+        z-index: 1;
+        position: absolute;
+        border: thin solid #000000;
+        background-color: white;
+        font-size: x-small;
+        text-align: center;
+      }
+
+      .chartConnectorsPlane {
+        z-index: 0;
+      }
+
+      .chartHLine {
+        z-index: 0;
+        position: absolute;
+        border-top: thin solid #000000;
+      }
+
+      .chartVLine {
+        z-index: 0;
+        position: absolute;
+        border-left: thin solid #000000;
+      }
+
+      .chartHLineDotted {
+        z-index: 0;
+        position: absolute;
+        border-top: thin dotted #000000;
+      }
+
+      .chartVLineDotted {
+        z-index: 0;
+        position: absolute;
+        border-left: thin dotted #000000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
