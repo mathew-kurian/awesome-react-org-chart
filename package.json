@@ -9,7 +9,7 @@
     "react-dom": "^15"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "keywords": [
     "awesome",
