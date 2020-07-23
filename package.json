@@ -2,7 +2,8 @@
   "name": "awesome-react-org-chart",
   "version": "0.0.0-semantic-release",
   "description": "Renders large organization charts with multiple compaction/packing techniques to improve readability and accessibility.",
-  "main": "dist/OrgChart.js",
+  "main": "./dist/OrgChart.js",
+  "typings": "./dist/OrgChart.d.ts",
   "dependencies": {
     "react": "^15",
     "react-dom": "^15"
