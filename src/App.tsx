@@ -43,19 +43,21 @@ const dataSets: Node[][] = [
 ];
 
 export default class App extends Component<
-  {},
+  void,
   {
     layout: string;
     dataSetIndex: number;
+    globalCounter: number
   }
 > {
   state = {
     layout: layouts[0],
     dataSetIndex: 0,
+    globalCounter: 0
   };
 
   render() {
-    const { layout, dataSetIndex } = this.state;
+    const { layout, dataSetIndex, globalCounter } = this.state;
     const nodes = dataSets[dataSetIndex % dataSets.length];
 
     return (
@@ -109,7 +111,7 @@ export default class App extends Component<
             }
             containerStyle={{ margin: "0 auto" }}
             renderNode={(node, { setCollapsed, collapsed }) => (
-              <Card style={{ width: "18rem" }}>
+              <Card style={{ width: "25rem" }}>
                 <Card.Body>
                   <div
                     style={{
@@ -132,11 +134,18 @@ export default class App extends Component<
                   {node.children.length > 0 && (
                     <Button
                       variant="primary"
+                      style={{marginRight: 5}}
                       onClick={() => setCollapsed(!collapsed)}
                     >
                       {collapsed ? "Expand" : "Collapse"}
                     </Button>
                   )}
+                  <Button
+                    variant="secondary"
+                    onClick={() => this.setState({globalCounter: globalCounter + 1})}
+                  >
+                    Global Counter ({globalCounter})
+                  </Button>
                 </Card.Body>
               </Card>
             )}

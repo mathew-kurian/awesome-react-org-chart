@@ -3515,7 +3515,7 @@ Bridge.Reflection = {
   },
 
   load: function (name) {
-    return System.Reflection.Assembly.assemblies[name] || require(name);
+    return System.Reflection.Assembly.assemblies[name];
   },
 
   getGenericTypeDefinition: function (type) {
@@ -10738,7 +10738,7 @@ System.UInt64.precision = 20;
   else if ("undefined" != typeof module && module.exports) {
     if (((module.exports = xn), !bn))
       try {
-        bn = require("crypto");
+        throw Error('Cannot include crypto library');
       } catch (Cn) {}
   } else
     n ||

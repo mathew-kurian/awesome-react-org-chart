@@ -31,6 +31,7 @@ export default class TreeChartLayout {
     this._connectorHorizontalClassName = connectorHorizontalClassName;
     this._parentSpacing = parentSpacing;
     this._siblingSpacing = siblingSpacing;
+    this._renderCount = 0;
   }
 
   render(nodeContainer, dataItem, level, box) {
@@ -45,6 +46,10 @@ export default class TreeChartLayout {
       dataBound: box.getIsDataBound(),
       level,
     });
+  }
+
+  renderCount() {
+    return this._renderCount;
   }
 
   setSpacing({ parentSpacing, siblingSpacing }) {
@@ -70,6 +75,10 @@ export default class TreeChartLayout {
 
   positionBoxes() {
     this._chartApp.positionBoxes();
+  }
+
+  rerender() {
+    this._chartApp.renderBoxes();
   }
 
   getDataSource() {
@@ -340,6 +349,8 @@ export default class TreeChartLayout {
         },
 
         renderBoxes: () => {
+          this._renderCount++;
+
           var boxContainer = ChartApp.diagram.getBoxes();
           var dataSource = ChartApp.dataSource;
 
