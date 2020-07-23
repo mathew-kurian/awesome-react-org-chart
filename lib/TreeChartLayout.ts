@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { Bridge } from './vendor/bridge';
+import { Bridge } from "./vendor/bridge";
 import "./vendor/bridge.collections";
 import "./vendor/OrgChartLayout";
 
@@ -167,6 +167,11 @@ export default class TreeChartLayout {
           chartConnectorsPlane.style.zIndex = 0;
 
           this._container.appendChild(chartConnectorsPlane);
+
+          if (this._chartConnectorsPlane != null) {
+            this._container.removeChild(this._chartConnectorsPlane);
+          }
+
           this._chartConnectorsPlane = chartConnectorsPlane;
 
           var dataSource = this.getDataSource();
