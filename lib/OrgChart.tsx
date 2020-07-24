@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 // @ts-ignore
 import TreeChartLayout from "./TreeChartLayout";
+import Portal from "./Portal";
 
 export type LayoutType =
   | "linear"
@@ -204,15 +205,30 @@ export default class OrgChart<T> extends React.Component<OrgChartProps<T>> {
     }
   }
 
+  _tracked: Record<string, Portal> = {};
   renderNode(
     domNode: HTMLDivElement,
     props: TreeChartLayoutRenderCallbackProps<T>
   ): { width: number; height: number } {
-    const { sizeGetter } = this.props;
+    const { sizeGetter, keyGetter } = this.props;
     const { data: node, ...otherProps } = props;
     const reactElement = this.props.renderNode(node, otherProps);
+    const key = keyGetter(node);
+    const prevPortal = this._tracked[key];
 
-    ReactDOM.render(reactElement, domNode);
+    if (prevPortal) {
+      // @ts-ignore
+      prevPortal.setChildType(reactElement.type);
+      prevPortal.setChildProps(reactElement.props);
+    }
+
+    // @ts-ignore
+    const portal = ReactDOM.render(<Portal childType={reactElement.type} childProps={reactElement.props} />, domNode);
+
+    if (!prevPortal) {
+      // @ts-ignore
+      this._tracked[key] = portal;
+    }
 
     return sizeGetter(node, domNode, reactElement);
   }
