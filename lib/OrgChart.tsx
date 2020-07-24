@@ -194,9 +194,9 @@ export default class OrgChart<T> extends React.Component<OrgChartProps<T>> {
 
       setTimeout(() => {
         if (this._mounted) {
-          const nextRerenderCount = treeLayout.renderCount();
+          const nextRenderCount = treeLayout.renderCount();
 
-          if (nextRerenderCount === renderCount) {
+          if (nextRenderCount === renderCount) {
             treeLayout.rerender();
           }
         }

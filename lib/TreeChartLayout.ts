@@ -537,7 +537,7 @@ export default class TreeChartLayout {
           this._container.style.width = `${diagramBoundary.Size.Width}px`;
 
           var offsetx = -diagramBoundary.getLeft();
-          var offsety = 0;
+          var offsety = -diagramBoundary.getTop();
 
           var visitorFunc = (node) => {
             if (node.State.IsHidden) {
