@@ -11,6 +11,7 @@ import BoundaryChangedEventArgs from "./BoundaryChangedEventArgs";
 import Rect from "./Rect";
 import LayoutAlgorithm from "./LayoutAlgorithm";
 import { peek } from "./Utils";
+import EventHandler from "./EventHandler";
 
 export default class LayoutState {
   private _currentOperation: Operation = Operation.Idle;

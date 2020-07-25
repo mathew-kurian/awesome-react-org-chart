@@ -53,7 +53,7 @@ export default class BoxTree {
 
     // TODO convert to const
     let box: Box;
-    for (box of state.Diagram.Boxes.BoxesById.Values) {
+    for (box of state.Diagram.Boxes.BoxesById.values()) {
       const node = new Node(box);
       result.Nodes.set(box.Id, node);
     }
