@@ -21,24 +21,34 @@ export default class NodeLayoutInfo {
   }
 
   IsHidden: boolean = false;
-  NumberOfSiblings: number = 0;
-  NumberOfSiblingRows: number = 0;
-  NumberOfSiblingColumns: number = 0;
   Connector: Connector | null = null;
 
-  private _size: Size | null = null;
+  _numberOfSiblings: number = 0;
+  _numberOfSiblingsRows: number = 0;
+  _numberOfSiblingsColumns: number = 0;
 
-  get Size(): Size {
-    if (this._size == null) {
-      throw Error("Size is null");
-    }
-
-    return this._size;
+  get NumberOfSiblings(): number {
+    return this._numberOfSiblings;
+  }
+  get NumberOfSiblingRows(): number {
+    return this._numberOfSiblingsRows;
+  }
+  get NumberOfSiblingColumns(): number {
+    return this._numberOfSiblingsColumns;
+  }
+  set NumberOfSiblings(value: number) {
+    this._numberOfSiblings = Math.floor(value);
+  }
+  set NumberOfSiblingRows(value: number) {
+    this._numberOfSiblingsRows = Math.floor(value);
+  }
+  set NumberOfSiblingColumns(value: number) {
+    this._numberOfSiblingsColumns = Math.floor(value);
   }
 
-  set Size(value: Size) {
-    this._size = value;
-  }
+  Size = new Size(0, 0);
+  TopLeft = new Point(0, 0);
+  BranchExterior: Rect = new Rect(0, 0, 0, 0);
 
   private _siblingsRowV: Dimensions | null = null;
 
@@ -52,34 +62,6 @@ export default class NodeLayoutInfo {
 
   set SiblingsRowV(value: Dimensions) {
     this._siblingsRowV = value;
-  }
-
-  private _topLeft: Point | null = null;
-
-  get TopLeft(): Point {
-    if (this._topLeft == null) {
-      throw Error("TopLeft is null");
-    }
-
-    return this._topLeft;
-  }
-
-  set TopLeft(value: Point) {
-    this._topLeft = value;
-  }
-
-  private _branchExterior: Rect | null = null;
-
-  get BranchExterior(): Rect {
-    if (this._branchExterior == null) {
-      throw Error("BranchExterior is null");
-    }
-
-    return this._branchExterior;
-  }
-
-  set BranchExterior(value: Rect) {
-    this._branchExterior = value;
   }
 
   get Left(): number {

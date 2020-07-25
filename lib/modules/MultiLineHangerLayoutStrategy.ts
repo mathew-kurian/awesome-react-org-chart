@@ -47,7 +47,9 @@ export default class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy 
       // add one (for vertical spacer) into the count of layout columns
       node.State.NumberOfSiblingColumns = 1 + this.MaxSiblingsPerRow;
 
-      node.State.NumberOfSiblingRows = node.ChildCount / this.MaxSiblingsPerRow;
+      node.State.NumberOfSiblingRows = Math.floor(
+        node.ChildCount / this.MaxSiblingsPerRow
+      );
       if (lastRowBoxCount != 0) {
         node.State.NumberOfSiblingRows++;
       }
@@ -57,14 +59,14 @@ export default class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy 
         node.ChildCount + node.State.NumberOfSiblingRows;
       if (
         lastRowBoxCount > 0 &&
-        lastRowBoxCount <= this.MaxSiblingsPerRow / 2
+        lastRowBoxCount <= Math.floor(this.MaxSiblingsPerRow / 2)
       ) {
         // don't need the last spacer, last row is half-full or even less
         node.State.NumberOfSiblings--;
       }
 
       // sibling middle-spacers have to be inserted between siblings
-      let ix = this.MaxSiblingsPerRow / 2;
+      let ix = Math.floor(this.MaxSiblingsPerRow / 2);
       while (ix < node.State.NumberOfSiblings) {
         let siblingSpacer = Box.Special(Box.None, node.Element.Id, false);
         node.InsertRegularChildBoxByIndex(ix, siblingSpacer);
@@ -172,7 +174,8 @@ export default class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy 
       );
 
       // now assign size to the vertical spacer, if any
-      let spacerIndex = from + node.State.NumberOfSiblingColumns / 2;
+      let spacerIndex =
+        from + Math.floor(node.State.NumberOfSiblingColumns / 2);
       if (spacerIndex < node.State.NumberOfSiblings) {
         // in the last row, spacer should only extend to the siblings row bottom,
         // because main vertical carrier does not go below last row
@@ -232,7 +235,8 @@ export default class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy 
 
     // now align children under parent
     let rect = node.State;
-    let spacer = node.Children[node.State.NumberOfSiblingColumns / 2];
+    let spacer =
+      node.Children[Math.floor(node.State.NumberOfSiblingColumns / 2)];
     let desiredCenter = spacer.State.CenterH;
     let diff = rect.CenterH - desiredCenter;
     LayoutAlgorithm.MoveChildrenOnly(state, level, diff);
@@ -268,7 +272,7 @@ export default class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy 
         node.Children[
           1 +
             node.State.NumberOfSiblings +
-            firstInRowIndex / node.State.NumberOfSiblingColumns
+            Math.floor(firstInRowIndex / node.State.NumberOfSiblingColumns)
         ];
 
       let width =

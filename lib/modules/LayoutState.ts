@@ -64,7 +64,7 @@ export default class LayoutState {
       this._pooledBoundaries.push(new Boundary());
     }
 
-    let boundary = this._pooledBoundaries.pop();
+    const boundary = this._pooledBoundaries.pop();
 
     switch (this.CurrentOperation) {
       case Operation.VerticalLayout:

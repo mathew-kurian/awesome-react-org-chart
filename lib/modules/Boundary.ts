@@ -56,10 +56,6 @@ export default class Boundary {
     this.Left.length = 0;
     this.Right.length = 0;
 
-    if (node.State.Size == null) {
-      throw Error("Size is null");
-    }
-
     // adjust the top edge to fit the logical grid
     this.BoundingRect = Rect.from(node.State.Size, node.State.TopLeft);
   }

@@ -72,6 +72,10 @@ export default class Node {
     child.ParentNode = this;
     child.Level = this.Level + 1;
 
+    // if (child.Element.Id === -1) {
+    //   debugger;
+    // }
+
     return this;
   }
 
