@@ -42,6 +42,10 @@ export default class Node {
     return this.InsertRegularChild(this.ChildCount, child);
   }
 
+  public AddRegularChildBox(child: Box): Node {
+    return this.InsertRegularChildBoxByIndex(this.ChildCount, child);
+  }
+
   /// <summary>
   /// Adds a new child to the list. Returns reference to self.
   /// </summary>

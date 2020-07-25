@@ -24,9 +24,35 @@ export default class NodeLayoutInfo {
   NumberOfSiblings: number = 0;
   NumberOfSiblingRows: number = 0;
   NumberOfSiblingColumns: number = 0;
-  Size: Size | null = null;
-  SiblingsRowV: Dimensions | null = null;
   Connector: Connector | null = null;
+
+  private _size: Size | null = null;
+
+  get Size(): Size {
+    if (this._size == null) {
+      throw Error("Size is null");
+    }
+
+    return this._size;
+  }
+
+  set Size(value: Size) {
+    this._size = value;
+  }
+
+  private _siblingsRowV: Dimensions | null = null;
+
+  get SiblingsRowV(): Dimensions {
+    if (this._siblingsRowV == null) {
+      throw Error("SiblingsRowV is null");
+    }
+
+    return this._siblingsRowV;
+  }
+
+  set SiblingsRowV(value: Dimensions) {
+    this._siblingsRowV = value;
+  }
 
   private _topLeft: Point | null = null;
 
