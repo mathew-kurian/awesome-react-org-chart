@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <script src="./scripts/jquery.min.js"></script>
+    <script src="./scripts/demo.js"></script>
+  </head>
+  <body>
+    <style>
+      .expander {
+        z-index: 2;
+        position: absolute;
+        border: none;
+        background-color: none;
+        font-size: smaller;
+        width: 10px;
+        height: 10px;
+        text-align: center;
+        margin: 0px;
+        color: red;
+      }
+
+      .chartBoxTop {
+        z-index: 1;
+        position: absolute;
+        border: thin solid #000000;
+        background-color: yellow;
+        font-size: x-small;
+        text-align: center;
+      }
+
+      .chartBoxMiddle {
+        z-index: 1;
+        position: absolute;
+        border: thin solid #000000;
+        background-color: whitesmoke;
+        font-size: x-small;
+        text-align: center;
+      }
+
+      .chartBoxLower {
+        z-index: 1;
+        position: absolute;
+        border: thin solid #000000;
+        background-color: lemonchiffon;
+        font-size: x-small;
+        text-align: center;
+      }
+
+      .chartBoxLowest {
+        z-index: 1;
+        position: absolute;
+        border: thin solid #000000;
+        background-color: white;
+        font-size: x-small;
+        text-align: center;
+      }
+
+      .chartConnectorsPlane {
+        z-index: 0;
+      }
+
+      .chartHLine {
+        z-index: 0;
+        position: absolute;
+        border-top: thin solid #000000;
+      }
+
+      .chartVLine {
+        z-index: 0;
+        position: absolute;
+        border-left: thin solid #000000;
+      }
+
+      .chartHLineDotted {
+        z-index: 0;
+        position: absolute;
+        border-top: thin dotted #000000;
+      }
+
+      .chartVLineDotted {
+        z-index: 0;
+        position: absolute;
+        border-left: thin dotted #000000;
+      }
+    </style>
+
+    <div class="row">
+      <div id="sample" style="">
+        <p>
+          <input
+            type="checkbox"
+            id="SuppressRootBox"
+            onchange="changedSuppressRootBox(this)"
+          />
+          <label for="SuppressRootBox"
+            >Suppress root data item, to have multiple roots in the
+            diagram</label
+          >
+          <br />
+          <input type="checkbox" id="CollapseAllOnRebuild" checked />
+          <label for="CollapseAllOnRebuild"
+            >Collapse all boxes on data change</label
+          >
+          <br />
+          <input
+            type="radio"
+            name="DataCounts"
+            id="DataCounts"
+            value="small"
+            onclick="clickDataCounts(this)"
+          />Small
+          <input
+            type="radio"
+            name="DataCounts"
+            id="DataCounts"
+            value="small-a"
+            checked
+            onclick="clickDataCounts(this)"
+          />Small with asst
+          <input
+            type="radio"
+            name="DataCounts"
+            id="DataCounts"
+            value="large"
+            onclick="clickDataCounts(this)"
+          />Large
+          <input
+            type="radio"
+            name="DataCounts"
+            id="DataCounts"
+            value="large-a"
+            onclick="clickDataCounts(this)"
+          />Large with asst
+          <input
+            type="radio"
+            name="DataCounts"
+            id="DataCounts"
+            value="huge-a"
+            onclick="clickDataCounts(this)"
+          />Huge with asst
+          <br />
+          <input
+            type="button"
+            id="collapseAll"
+            onclick="clickCollapseAll(this)"
+            value="Collapse All"
+          />
+          <input
+            type="button"
+            id="expandAll"
+            onclick="clickExpandAll(this)"
+            value="Expand All"
+          />
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="AllLinear"
+            onclick="clickOptimizer(this)"
+          />Linear
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="AllHanger2"
+            onclick="clickOptimizer(this)"
+          />Hanger2
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="AllHanger4"
+            onclick="clickOptimizer(this)"
+            checked
+          />Hanger4
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="AllFishbone1"
+            onclick="clickOptimizer(this)"
+          />Fishbone 1
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="AllFishbone2"
+            onclick="clickOptimizer(this)"
+          />Fishbone 2
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="AllSingleColumnLeft"
+            onclick="clickOptimizer(this)"
+          />1 Column L
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="AllSingleColumnRight"
+            onclick="clickOptimizer(this)"
+          />1 Column R
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="Smart"
+            onclick="clickOptimizer(this)"
+          />Smart
+          <input
+            type="radio"
+            name="SelectBranchOptimizer"
+            id="SelectBranchOptimizer"
+            value="Stackers"
+            onclick="clickOptimizer(this)"
+          />Stackers
+        </p>
+        <div
+          id="myDiagramDiv"
+          style="
+            background-color: white;
+            border: dotted 1px black;
+            width: 10px;
+            height: 10px;
+          "
+        ></div>
+      </div>
+    </div>
+
+    <script></script>
+  </body>
+</html>
