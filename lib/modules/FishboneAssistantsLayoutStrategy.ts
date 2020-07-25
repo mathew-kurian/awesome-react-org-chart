@@ -22,7 +22,7 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
       // using column == group here,
       // and each group consists of two vertical stretches of boxes with a vertical carrier in between
       node.State.NumberOfSiblingColumns = 1;
-      node.State.NumberOfSiblingRows = node.State.NumberOfSiblings / 2;
+      node.State.NumberOfSiblingRows = Math.floor(node.State.NumberOfSiblings / 2);
       if (node.State.NumberOfSiblings % 2 != 0) {
         node.State.NumberOfSiblingRows++;
       }
@@ -251,7 +251,7 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
   public GetSupportsAssistants = () => false;
 
   private MaxOnLeft = (node: Node): number =>
-    node.State.NumberOfSiblings / 2 + (node.State.NumberOfSiblings % 2);
+    Math.floor(node.State.NumberOfSiblings / 2) + (node.State.NumberOfSiblings % 2);
   private NeedCarrierProtector = (node: Node): boolean =>
     node.ParentNode?.ChildCount == 0;
 

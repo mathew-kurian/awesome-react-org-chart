@@ -59,7 +59,7 @@ class GroupIterator {
       this.Group++;
     }
     this.Count = this.CountInGroup();
-    this.MaxOnLeft = this.Count / 2 + (this.Count % 2);
+    this.MaxOnLeft = Math.floor(this.Count / 2) + (this.Count % 2);
     return this.Count != 0;
   }
 }
@@ -322,8 +322,9 @@ export default class MultiLineFishboneLayoutStrategy extends LinearLayoutStrateg
       // using column == group here,
       // and each group consists of two vertical stretches of boxes with a vertical carrier in between
       node.State.NumberOfSiblingColumns = this.MaxGroups;
-      node.State.NumberOfSiblingRows =
-        node.State.NumberOfSiblings / (this.MaxGroups * 2);
+      node.State.NumberOfSiblingRows = Math.floor(
+        node.State.NumberOfSiblings / (this.MaxGroups * 2)
+      );
       if (node.State.NumberOfSiblings % (this.MaxGroups * 2) != 0) {
         node.State.NumberOfSiblingRows++;
       }
