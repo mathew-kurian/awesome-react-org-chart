@@ -186,7 +186,7 @@ export default class LayoutAlgorithm {
         if (node.IsAssistantRoot) {
           if (strategy == null) {
             strategy =
-              node.ParentNode.Element.AssistantLayoutStrategyId != null
+              node.ParentNode?.Element.AssistantLayoutStrategyId != null
                 ? state.Diagram.LayoutSettings.LayoutStrategies.get(
                     node.ParentNode.Element.AssistantLayoutStrategyId
                   )
@@ -333,8 +333,12 @@ export default class LayoutAlgorithm {
 
     const action: Func<Node, boolean> = (node) => {
       if (!node.State.IsHidden) {
-        node.State.TopLeft = node.State.TopLeft.MoveH(offset);
-        node.State.BranchExterior = node.State.BranchExterior.MoveH(offset);
+        try {
+          node.State.TopLeft = node.State.TopLeft.MoveH(offset);
+          node.State.BranchExterior = node.State.BranchExterior.MoveH(offset);
+        } catch (e) {
+          // ignore
+        }
       }
 
       return true;

@@ -207,7 +207,7 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
       count++;
     }
 
-    var segments: Edge[] = new Array<Edge>(count);
+    var segments: Edge[] = [];
 
     var ix = 0;
 
@@ -253,7 +253,7 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
   private MaxOnLeft = (node: Node): number =>
     node.State.NumberOfSiblings / 2 + (node.State.NumberOfSiblings % 2);
   private NeedCarrierProtector = (node: Node): boolean =>
-    node.ParentNode.ChildCount == 0;
+    node.ParentNode?.ChildCount == 0;
 
   private EnumerateSiblings(node: Node, from: number, to: number): Node[] {
     const nodes: Node[] = [];

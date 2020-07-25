@@ -34,7 +34,7 @@ export default class BoxContainer {
     const map = new Map<string, number>();
 
     // generate identifiers mapping, need this because data comes in random order
-    for (const dataId in source.AllDataItemIds) {
+    for (const dataId of source.AllDataItemIds) {
       map.set(dataId, this.NextBoxId());
     }
 
@@ -56,7 +56,7 @@ export default class BoxContainer {
           getDataItem(dataId).IsAssistant
         );
       } else {
-        throw Error("_AddBox null");
+        // throw Error("_AddBox null");
       }
     }
   }

@@ -81,6 +81,49 @@ export default class TreeChartLayout {
     this._chartApp.renderBoxes();
   }
 
+  test() {
+    const OrgChart = this._orgChart;
+
+    console.log(OrgChart);
+
+    var dataSource = new OrgChart.Test.TestDataSource();
+    new OrgChart.Test.TestDataGen().GenerateDataItems(dataSource, 10, 0);
+
+    const boxContainer = new OrgChart.Layout.BoxContainer.$ctor1(dataSource);
+    OrgChart.Test.TestDataGen.GenerateBoxSizes(boxContainer);
+
+    const diagram = new OrgChart.Layout.Diagram();
+    diagram.setBoxes(boxContainer);
+
+    diagram.LayoutSettings.LayoutStrategies.set(
+      "default",
+      new OrgChart.Layout.LinearLayoutStrategy()
+    );
+
+    diagram.LayoutSettings.setDefaultLayoutStrategyId("default");
+    diagram.LayoutSettings.setDefaultAssistantLayoutStrategyId("default");
+
+    const state = new OrgChart.Layout.LayoutState(diagram);
+    state.setBoxSizeFunc((dataId: string | null) => {
+      if (dataId == null) {
+        return new Size(0, 0);
+        throw Error("dataId is null");
+      }
+
+      const box = boxContainer.getBoxesByDataId().get(dataId);
+
+      if (box == null) {
+        throw Error("Box is null");
+      }
+
+      return box.Size;
+    });
+
+    OrgChart.Layout.LayoutAlgorithm.Apply(state);
+
+    console.log(diagram.getVisualTree());
+    console.log(5, diagram.getVisualTree()?.Depth);
+  }
   getDataSource() {
     const OrgChart = Bridge.global.OrgChart;
     var dataSource = new OrgChart.Test.TestDataSource();
@@ -182,6 +225,10 @@ export default class TreeChartLayout {
           }
 
           this._chartConnectorsPlane = chartConnectorsPlane;
+
+          console.log("sup 2!");
+
+          this.test();
 
           var dataSource = this.getDataSource();
 

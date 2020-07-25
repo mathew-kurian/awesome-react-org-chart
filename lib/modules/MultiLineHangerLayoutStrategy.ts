@@ -325,7 +325,7 @@ class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy {
       }
     }
 
-    let segments: Edge[] = new Array(count);
+    let segments: Edge[] = [];
 
     let rootRect = node.State;
     let center = rootRect.CenterH;

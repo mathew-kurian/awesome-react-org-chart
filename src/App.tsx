@@ -5,6 +5,7 @@ import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Dropdown from "react-bootstrap/Dropdown";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
+import "../lib/Test";
 
 const layouts: LayoutType[] = [
   "linear",
@@ -47,13 +48,13 @@ export default class App extends Component<
   {
     layout: string;
     dataSetIndex: number;
-    globalCounter: number
+    globalCounter: number;
   }
 > {
   state = {
     layout: layouts[0],
     dataSetIndex: 0,
-    globalCounter: 0
+    globalCounter: 0,
   };
 
   render() {
@@ -134,7 +135,7 @@ export default class App extends Component<
                   {node.children.length > 0 && (
                     <Button
                       variant="primary"
-                      style={{marginRight: 5}}
+                      style={{ marginRight: 5 }}
                       onClick={() => setCollapsed(!collapsed)}
                     >
                       {collapsed ? "Expand" : "Collapse"}
@@ -142,7 +143,9 @@ export default class App extends Component<
                   )}
                   <Button
                     variant="secondary"
-                    onClick={() => this.setState({globalCounter: globalCounter + 1})}
+                    onClick={() =>
+                      this.setState({ globalCounter: globalCounter + 1 })
+                    }
                   >
                     Global Counter ({globalCounter})
                   </Button>

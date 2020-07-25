@@ -5,12 +5,12 @@ import Predicate from "./Predicate";
 import Action from "./Action";
 
 export default class Node {
-  Level: number;
+  Level: number = 0;
   Element: Box;
   State: NodeLayoutInfo;
-  ParentNode: Node;
   Children: Node[] = [];
   AssistantsRoot: Node | null = null;
+  ParentNode: Node | null = null;
 
   get ChildCount(): number {
     return this.Children?.length || 0;

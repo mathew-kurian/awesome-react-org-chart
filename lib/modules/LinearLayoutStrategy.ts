@@ -198,7 +198,7 @@ export default class LinearLayoutStrategy extends LayoutStrategyBase {
       return;
     }
 
-    let segments: Edge[] = new Array<Edge>(count);
+    let segments: Edge[] = [];
 
     let rootRect = node.State;
     let center = rootRect.CenterH;

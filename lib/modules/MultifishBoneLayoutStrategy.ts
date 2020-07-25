@@ -71,7 +71,7 @@ class TreeNodeView extends Node {
 
   Prepare(capacity: number) {
     if (this.Children == null) {
-      this.Children = new Array(capacity);
+      this.Children = [];
     } else {
       this.Children.length = 0;
     }
@@ -492,7 +492,7 @@ export default class MultiLineFishboneLayoutStrategy extends LinearLayoutStrateg
       count++;
     }
 
-    let segments: Edge[] = new Array<Edge>(count);
+    let segments: Edge[] = [];
 
     let rootRect = node.State;
     let center = rootRect.CenterH;
