@@ -18,7 +18,7 @@ import Rect from "./Rect";
 /// Children are attached to long horizontal carriers,
 /// with a central vertical carrier going through them from parent's bottom.
 /// </summary>
-class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy {
+export default class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy {
   /// <summary>
   /// Maximum number of siblings in a horizontal row.
   /// </summary>

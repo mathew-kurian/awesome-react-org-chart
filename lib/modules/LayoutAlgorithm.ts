@@ -180,6 +180,15 @@ export default class LayoutAlgorithm {
             strategy = state.Diagram.LayoutSettings.LayoutStrategies.get(
               suggestedStrategyId
             );
+
+            if (process.env.NODE_ENV !== "production") {
+              if (!strategy) {
+                console.info("Invalid strategy:", {
+                  suggestedStrategyId,
+                  strategy,
+                });
+              }
+            }
           }
         }
 
