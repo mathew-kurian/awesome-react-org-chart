@@ -25,9 +25,9 @@ export default class Node {
       this.AssistantsRoot = new Node(
         Box.Special(Box.None, this.Element.Id, true)
       );
-      {
-        (this.ParentNode = this), (this.Level = this.Level + 1);
-      }
+
+      this.AssistantsRoot.ParentNode = this;
+      this.AssistantsRoot.Level = this.AssistantsRoot.Level + 1;
     }
 
     this.AssistantsRoot.AddRegularChild(child);

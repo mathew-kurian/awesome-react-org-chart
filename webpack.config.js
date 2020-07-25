@@ -15,10 +15,13 @@ module.exports = {
     modules: ["node_modules"],
     extensions: [".ts", ".tsx", ".js", ".jsx"],
   },
-  entry: ["./src/index.tsx"],
+  entry: {
+    bundle: "./src/index.tsx",
+    demo: "./src/demo.ts",
+  },
   output: {
     path: path.join(__dirname, "public/scripts"),
-    filename: "bundle.js",
+    filename: "[name].js",
   },
   optimization: {
     minimize: isProduction,
@@ -40,14 +43,14 @@ module.exports = {
             target: "es2015", // default, or 'es20XX', 'esnext'
             jsxFactory: "React.createElement",
             jsxFragment: "React.Fragment",
-            sourceMap: !isProduction, // Enable sourcemap
+            // sourceMap: "external", // Enable sourcemap
             minify: isProduction,
           },
         },
       },
     ],
   },
-  devtool: "false",
+  devtool: "source-map",
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
     new webpack.NamedModulesPlugin(),

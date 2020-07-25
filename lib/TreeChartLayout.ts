@@ -97,7 +97,7 @@ export default class TreeChartLayout {
 
     diagram.LayoutSettings.LayoutStrategies.set(
       "default",
-      new OrgChart.Layout.LinearLayoutStrategy()
+      new OrgChart.Layout.MultiLineHangerLayoutStrategy()
     );
 
     diagram.LayoutSettings.setDefaultLayoutStrategyId("default");

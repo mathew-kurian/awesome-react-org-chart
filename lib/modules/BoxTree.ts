@@ -28,7 +28,8 @@ export default class BoxTree {
 
   UpdateHierarchyStats() {
     this.Depth = 0;
-    this.IterateParentFirst((x) => {
+
+    this.IterateParentFirst((x: Node) => {
       if (x.ParentNode != null) {
         x.Level = x.ParentNode.Level;
         if (!x.ParentNode.IsAssistantRoot) {

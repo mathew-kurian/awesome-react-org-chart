@@ -15,7 +15,7 @@ export default class Box {
   static None = -1;
 
   get IsDataBound() {
-    return this.DataId == null;
+    return this.DataId != null;
   }
 
   static Special(
