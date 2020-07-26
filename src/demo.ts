@@ -17,6 +17,7 @@ import Size from "../lib/modules/Size";
 import LayoutAlgorithm from "../lib/modules/LayoutAlgorithm";
 import MultiLineHangerLayoutStrategy from "../lib/modules/MultiLineHangerLayoutStrategy";
 import FishboneAssistantsLayoutStrategy from "../lib/modules/FishboneAssistantsLayoutStrategy";
+import { connect } from "http2";
 
 declare const $;
 
@@ -238,12 +239,8 @@ class ChartApp {
     let boxContainer = this.diagram.Boxes;
     let dataSource = this.dataSource;
 
-    let expanderHtml =
-      '<div id="exp{0}" class="expander" onclick="window.chartApp.boxClick({0})">?</div>';
-    let boxHtml =
-      '<div id="box{0}" class="{2}" style="width: 150px; height: auto;" onclick="window.chartApp.boxClick({0})"><p><b>{3}</b></p>Box #{0}, Data #{1}, Asst: {4}</div>';
-
-    const boxHtmls = [];
+    const elements: Element[] = [];
+    const expanders: Element[] = [];
 
     let visitorFunc = (node: Node) => {
       let box = node.Element;
@@ -270,52 +267,38 @@ class ChartApp {
         let level = this.getBoxLevel(boxContainer, box);
         let dataItem = dataSource.GetDataItem(box.DataId);
 
-        // level 0 is always for the BoxContainer.SystemRoot
-        // normal boxes are under it, so they start at level 1
-        if (level === 1) {
-          boxHtmls.push(
-            boxHtml.format(
-              box.Id,
-              box.DataId,
-              "chartBoxTop",
-              "Top",
-              box.IsAssistant
-            )
-          );
-        } else if (level === 2) {
-          boxHtmls.push(
-            boxHtml.format(
-              box.Id,
-              box.DataId,
-              "chartBoxMiddle",
-              "Middle",
-              box.IsAssistant
-            )
-          );
-        } else if (level === 3) {
-          boxHtmls.push(
-            boxHtml.format(
-              box.Id,
-              box.DataId,
-              "chartBoxLower",
-              "Lower",
-              box.IsAssistant
-            )
-          );
-        } else {
-          boxHtmls.push(
-            boxHtml.format(
-              box.Id,
-              box.DataId,
-              "chartBoxLowest",
-              "Lowest ({0})".format(level),
-              box.IsAssistant
-            )
-          );
-        }
+        const className =
+          {
+            1: "chartBoxTop",
+            2: "chartBoxMiddle",
+            3: "chartBoxLower",
+          }[level] || "chartBoxLowest";
+
+        const position =
+          {
+            1: "Top",
+            2: "Middle",
+            3: "Lower",
+          }[level] || level;
+
+        const element = document.createElement("div");
+        element.className = className;
+        element.id = `box${box.Id}`;
+        element.style.position = "absolute";
+        element.style.width = "150px";
+        element.style.height = "auto";
+        element.innerText = `${position} - Box #${box.Id}, Data #${box.DataId}, Asst: ${box.IsAssistant}`;
+        element.addEventListener("click", () => this.boxClick(box.Id));
+
+        elements.push(element);
 
         if (node.ChildCount > 0 || node.AssistantsRoot != null) {
-          boxHtmls.push(expanderHtml.format(box.Id));
+          const expander = document.createElement("div");
+          expander.id = `exp${box.Id}`;
+          expander.className = "expander";
+          expander.addEventListener("click", () => this.boxClick(box.Id));
+
+          expanders.push(expander);
         }
 
         // now store element size, as rendered by browser
@@ -327,14 +310,24 @@ class ChartApp {
 
     this.diagram.VisualTree.IterateParentFirst(visitorFunc);
 
-    document
-      .querySelector("#myDiagramDiv")
-      .insertAdjacentHTML("afterbegin", boxHtmls.join(""));
+    const myDiagramDiv = document.querySelector("#myDiagramDiv");
+
+    for (const expander of expanders) {
+      myDiagramDiv.appendChild(expander);
+    }
+    for (const element of elements) {
+      myDiagramDiv.appendChild(element);
+    }
   }
 
   getBranchOptimizerName(node: Node): string {
-    const value = $("input[name='SelectBranchOptimizer']:checked").val();
-    const func = this["branchOptimizer" + value];
+    const selector: HTMLInputElement | null = document.querySelector(
+      "input[name='SelectBranchOptimizer']:checked"
+    );
+
+    const func =
+      this["branchOptimizer" + selector?.value] ||
+      this.branchOptimizerAllLinear;
 
     return func(node);
   }
@@ -417,7 +410,7 @@ class ChartApp {
   }
 
   getBoxElementSize(boxId: number) {
-    return new Size(152, 48);
+    return new Size(160, 50);
   }
 
   positionBoxes() {
@@ -431,6 +424,7 @@ class ChartApp {
 
     state.OperationChanged = this.onLayoutStateChanged;
     state.BoxSizeFunc = (dataId: string) => this.boxSizeFunc(dataId);
+
     state.LayoutOptimizerFunc = (node: Node) =>
       this.getBranchOptimizerName(node);
 
@@ -438,16 +432,23 @@ class ChartApp {
 
     LayoutAlgorithm.Apply(state);
 
-    let diagramBoundary = LayoutAlgorithm.ComputeBranchVisualBoundingRect(
+    const diagramBoundary = LayoutAlgorithm.ComputeBranchVisualBoundingRect(
       diagram.VisualTree
     );
 
-    $("#myDiagramDiv").width(diagramBoundary.Size.Width);
-    $("#myDiagramDiv").height(diagramBoundary.Size.Height);
+    const myDiagramDiv: HTMLElement = document.querySelector("#myDiagramDiv");
 
-    let viewPort = $("#myDiagramDiv").offset();
-    let offsetx = -diagramBoundary.Left + viewPort.left;
-    let offsety = -diagramBoundary.Top + viewPort.top;
+    if (myDiagramDiv == null) {
+      throw Error("Cannot find #myDiagramDiv");
+    }
+
+    myDiagramDiv.style.width = `${diagramBoundary.Size.Width}px`;
+    myDiagramDiv.style.height = `${diagramBoundary.Size.Height}px`;
+
+    let offsetx = -diagramBoundary.Left;
+    let offsety = -diagramBoundary.Top;
+
+    const connectors: Element[] = [];
 
     let visitorFunc = function (node: Node) {
       if (node.State.IsHidden) {
@@ -462,26 +463,34 @@ class ChartApp {
         // So now we only have to position them.
         // Connectors, however, are not rendered until layout is complete (see next block).
 
-        let div = $("#box" + box.Id);
-        if (div.length > 0) {
+        const element: HTMLElement | null = document.querySelector(
+          `#box${box.Id}`
+        );
+
+        if (element) {
           let x = node.State.TopLeft.X + offsetx;
           let y = node.State.TopLeft.Y + offsety;
 
-          div.offset({ left: x, top: y });
-          div.css("width", node.State.Size.Width);
-          div.css("height", node.State.Size.Height);
+          element.style.left = `${x}px`;
+          element.style.top = `${y}px`;
+          element.style.width = `${node.State.Size.Width}px`;
+          element.style.height = `${node.State.Size.Height}px`;
 
           if (node.ChildCount > 0 || node.AssistantsRoot != null) {
-            let exp = $("#exp" + box.Id);
-            if (exp.length > 0) {
+            const exp: HTMLElement | null = document.querySelector(
+              "#exp" + box.Id
+            );
+            if (exp) {
               x = node.State.Right + offsetx - 15;
               y = node.State.Bottom + offsety - 15;
-              exp.offset({ left: x, top: y });
+
+              exp.style.left = `${x}px`;
+              exp.style.top = `${y}px`;
 
               if (box.IsCollapsed) {
-                exp.text("▼");
+                exp.innerText = "▼";
               } else {
-                exp.text("△");
+                exp.innerText = "△";
               }
             }
           }
@@ -521,19 +530,14 @@ class ChartApp {
             edgeType = edgeType + "Dotted";
           }
 
-          $("#myConnectors").append(
-            '<div class="' +
-              edgeType +
-              '" style="top:' +
-              (topLeft.Y + offsety) +
-              "px; left:" +
-              (topLeft.X + offsetx) +
-              "px; width:" +
-              width +
-              "px; height:" +
-              height +
-              'px;"/>'
-          );
+          const connector = document.createElement("div");
+          connector.className = edgeType;
+          connector.style.top = `${topLeft.Y + offsety}px`;
+          connector.style.left = `${topLeft.X + offsetx}px`;
+          connector.style.width = `${width}px`;
+          connector.style.height = `${height}px`;
+
+          connectors.push(connector);
         }
       }
 
@@ -541,6 +545,11 @@ class ChartApp {
     };
 
     diagram.VisualTree.IterateParentFirst(visitorFunc);
+
+    const myConnectors = document.querySelector("#myConnectors");
+    for (const connector of connectors) {
+      myConnectors.appendChild(connector);
+    }
   }
 }
 
