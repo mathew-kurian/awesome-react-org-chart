@@ -1,6 +1,6 @@
-import IChartDataSource from "../modules/IChartDataSource";
+import IChartDataSource from "../core/IChartDataSource";
 import TestDataItem from "./TestDataItem";
-import IChartDataItem from "../modules/IChartDataItem";
+import IChartDataItem from "../core/IChartDataItem";
 
 export default class TestDataSource implements IChartDataSource {
   /// <summary>

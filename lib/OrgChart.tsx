@@ -29,9 +29,9 @@ export type LayoutRenderProps<T> = Omit<
 >;
 
 interface OrgChartProps<T> {
-  root: T;
   layout?: LayoutType;
   containerStyle?: React.CSSProperties;
+  root: T;
   keyGetter: (node: T) => string;
   childNodesGetter: (node: T) => T[];
   sizeGetter: (

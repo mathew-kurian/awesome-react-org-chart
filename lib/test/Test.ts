@@ -1,11 +1,11 @@
-import TestDataSource from "./test/TestDataSource";
-import TestDataGen from "./test/TestDataGen";
-import Diagram from "./modules/Diagram";
-import BoxContainer from "./modules/BoxContainer";
-import LayoutState from "./modules/LayoutState";
-import LinearLayoutStrategy from "./modules/LinearLayoutStrategy";
-import LayoutAlgorithm from "./modules/LayoutAlgorithm";
-import Size from "./modules/Size";
+import TestDataSource from "./TestDataSource";
+import TestDataGen from "./TestDataGen";
+import Diagram from "../core/Diagram";
+import BoxContainer from "../core/BoxContainer";
+import LayoutState from "../core/LayoutState";
+import LinearLayoutStrategy from "../core/LinearLayoutStrategy";
+import LayoutAlgorithm from "../core/LayoutAlgorithm";
+import Size from "../core/Size";
 
 const dataSource = new TestDataSource();
 new TestDataGen().GenerateDataItems(dataSource, 10, 0);

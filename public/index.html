@@ -5,82 +5,22 @@
     <title>React OrgChart</title>
     <meta charset="utf-8" />
     <script src="/scripts/bundle.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      .expander {
-        z-index: 2;
-        position: absolute;
-        border: none;
-        background-color: none;
-        font-size: smaller;
-        width: 10px;
-        height: 10px;
-        text-align: center;
-        margin: 0px;
-        color: red;
+      body {
+        background: #171929;
       }
 
-      .chartBoxTop {
-        z-index: 1;
-        position: absolute;
-        border: thin solid #000000;
-        background-color: yellow;
-        font-size: x-small;
-        text-align: center;
+      * {
+        font-family: "Roboto", "Arial", sans-serif !important;
       }
 
-      .chartBoxMiddle {
-        z-index: 1;
-        position: absolute;
-        border: thin solid #000000;
-        background-color: whitesmoke;
-        font-size: x-small;
-        text-align: center;
-      }
-
-      .chartBoxLower {
-        z-index: 1;
-        position: absolute;
-        border: thin solid #000000;
-        background-color: lemonchiffon;
-        font-size: x-small;
-        text-align: center;
-      }
-
-      .chartBoxLowest {
-        z-index: 1;
-        position: absolute;
-        border: thin solid #000000;
-        background-color: white;
-        font-size: x-small;
-        text-align: center;
-      }
-
-      .chartConnectorsPlane {
-        z-index: 0;
-      }
-
-      .chartHLine {
-        z-index: 0;
-        position: absolute;
-        border-top: thin solid #000000;
-      }
-
-      .chartVLine {
-        z-index: 0;
-        position: absolute;
-        border-left: thin solid #000000;
-      }
-
-      .chartHLineDotted {
-        z-index: 0;
-        position: absolute;
-        border-top: thin dotted #000000;
-      }
-
-      .chartVLineDotted {
-        z-index: 0;
-        position: absolute;
-        border-left: thin dotted #000000;
+      h1 {
+        font-weight: 100 !important;
+        font-size: 4rem !important;
       }
     </style>
   </head>

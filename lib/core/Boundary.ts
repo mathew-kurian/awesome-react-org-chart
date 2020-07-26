@@ -105,8 +105,8 @@ export default class Boundary {
 
         var theirWins = merge == "r" ? my.X <= th.X : my.X >= th.X;
 
-        if (my.Top === th.Top) {
-          if (my.Bottom === th.Bottom) {
+        if (LayoutAlgorithm.IsEqual(my.Top, th.Top)) {
+          if (LayoutAlgorithm.IsEqual(my.Bottom, th.Bottom)) {
             // case 1: exactly same length and vertical position
             // th: ********
             // my: ********
@@ -141,7 +141,7 @@ export default class Boundary {
 
             this.ValidateState();
           }
-        } else if (my.Bottom == th.Bottom) {
+        } else if (LayoutAlgorithm.IsEqual(my.Bottom, th.Bottom)) {
           if (my.Top < th.Top) {
             // case 4: bottoms aligned, but my is longer
             // th:      ***

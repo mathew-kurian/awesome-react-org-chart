@@ -36,7 +36,7 @@ export default class LayoutState {
 
   Diagram: Diagram;
   BoxSizeFunc: Func<string | null, Size> | null = null;
-  LayoutOptimizerFunc: Func<Node, string> | null = null;
+  LayoutOptimizerFunc: Func<Node, string | null> | null = null;
   BoundaryChanged: EventHandler<
     LayoutState,
     BoundaryChangedEventArgs

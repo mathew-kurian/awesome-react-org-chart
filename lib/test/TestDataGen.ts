@@ -1,7 +1,7 @@
 import TestDataSource from "./TestDataSource";
 import TestDataItem from "./TestDataItem";
-import BoxContainer from "../modules/BoxContainer";
-import Size from "../modules/Size";
+import BoxContainer from "../core/BoxContainer";
+import Size from "../core/Size";
 import Random from "./Random";
 
 export default class TestDataGen {

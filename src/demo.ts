@@ -1,45 +1,24 @@
-import Diagram from "../lib/modules/Diagram";
-import BoxContainer from "../lib/modules/BoxContainer";
-import Box from "../lib/modules/Box";
-import Operation from "../lib/modules/Operation";
-import LinearLayoutStrategy from "../lib/modules/LinearLayoutStrategy";
-import StackingLayoutStrategy from "../lib/modules/StackingLayoutStrategy";
-import MultiLineFishboneLayoutStrategy from "../lib/modules/MultiLineFishboneLayoutStrategy";
-import SingleColumnLayoutStrategy from "../lib/modules/SingleColumnLayoutStrategy";
-import BranchParentAlignment from "../lib/modules/BranchParentAlignment";
+import Diagram from "../lib/core/Diagram";
+import BoxContainer from "../lib/core/BoxContainer";
+import Box from "../lib/core/Box";
+import Operation from "../lib/core/Operation";
+import LinearLayoutStrategy from "../lib/core/LinearLayoutStrategy";
+import StackingLayoutStrategy from "../lib/core/StackingLayoutStrategy";
+import MultiLineFishboneLayoutStrategy from "../lib/core/MultiLineFishboneLayoutStrategy";
+import SingleColumnLayoutStrategy from "../lib/core/SingleColumnLayoutStrategy";
+import BranchParentAlignment from "../lib/core/BranchParentAlignment";
 import TestDataSource from "../lib/test/TestDataSource";
 import TestDataGen from "../lib/test/TestDataGen";
-import LayoutStateOperationChangedEventArgs from "../lib/modules/LayoutStateOperationChangedEventArgs";
-import StackOrientation from "../lib/modules/StackOrientation";
-import LayoutState from "../lib/modules/LayoutState";
-import Node from "../lib/modules/Node";
-import Size from "../lib/modules/Size";
-import LayoutAlgorithm from "../lib/modules/LayoutAlgorithm";
-import MultiLineHangerLayoutStrategy from "../lib/modules/MultiLineHangerLayoutStrategy";
-import FishboneAssistantsLayoutStrategy from "../lib/modules/FishboneAssistantsLayoutStrategy";
-import { connect } from "http2";
+import LayoutStateOperationChangedEventArgs from "../lib/core/LayoutStateOperationChangedEventArgs";
+import StackOrientation from "../lib/core/StackOrientation";
+import LayoutState from "../lib/core/LayoutState";
+import Node from "../lib/core/Node";
+import Size from "../lib/core/Size";
+import LayoutAlgorithm from "../lib/core/LayoutAlgorithm";
+import MultiLineHangerLayoutStrategy from "../lib/core/MultiLineHangerLayoutStrategy";
+import FishboneAssistantsLayoutStrategy from "../lib/core/FishboneAssistantsLayoutStrategy";
 
 declare const $;
-
-declare global {
-  interface String {
-    format(...args: any[]): string;
-    f(...args: any[]): string;
-  }
-}
-
-// First, checks if it isn't implemented yet.
-if (!String.prototype.format) {
-  String.prototype.format = String.prototype.f = function () {
-    let s = this,
-      i = arguments.length;
-
-    while (i--) {
-      s = s.replace(new RegExp("\\{" + i + "\\}", "gm"), arguments[i]);
-    }
-    return s;
-  };
-}
 
 class ChartApp {
   diagram: Diagram;
@@ -517,6 +496,7 @@ class ChartApp {
             }
           } else {
             edgeType = "chartVLine";
+            width = 1;
             if (edge.From.Y < edge.To.Y) {
               topLeft = edge.From;
               height = edge.To.Y - edge.From.Y;

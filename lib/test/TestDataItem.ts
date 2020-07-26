@@ -1,4 +1,4 @@
-import IChartDataItem from "../modules/IChartDataItem";
+import IChartDataItem from "../core/IChartDataItem";
 
 export default interface TestDataItem extends IChartDataItem {
   /// <summary>
