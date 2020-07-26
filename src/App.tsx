@@ -47,6 +47,18 @@ export default class App extends Component<void, AppState> {
     collapsed: new WeakMap<Node, boolean>(),
   };
 
+  _header: React.RefObject<HTMLDivElement> = React.createRef();
+
+  componentDidMount() {
+    window.addEventListener("scroll", () => {
+      const header: HTMLDivElement | null = this._header.current;
+
+      if (header) {
+        header.style.transform = `translate3d(0, -${window.scrollY}px, 0)`;
+      }
+    });
+  }
+
   private static generateData(count: number): Node[] {
     const percentAssistants = 0;
     const dataSource = new TestDataSource();
@@ -77,9 +89,17 @@ export default class App extends Component<void, AppState> {
     }
 
     let parentNode;
+    let childrenSet = new Set<string>();
 
-    for (const id of dataSource.AllDataItemIds) {
+    for (const item of dataSource.Items.values()) {
+      const id = item.Id;
       const parentId = dataSource.GetParentKeyFunc(id);
+
+      if (childrenSet.has(id)) {
+        continue;
+      }
+
+      childrenSet.add(id);
 
       if (parentId) {
         const node = nodeMap.get(parentId);
@@ -110,11 +130,24 @@ export default class App extends Component<void, AppState> {
     return collapsed.get(node) || false;
   }
 
-  render() {
+  private renderHeader(isPlaceholder: boolean) {
     const { layout, nodes } = this.state;
 
     return (
-      <div style={{ padding: 20, paddingBottom: 50 }}>
+      <div
+        ref={isPlaceholder ? null : this._header}
+        style={{
+          padding: 30,
+          paddingBottom: 300,
+          marginBottom: -300,
+          background: "#3c4165",
+          position: isPlaceholder ? "relative" : "fixed",
+          opacity: isPlaceholder ? 0 : 1,
+          width: "100%",
+          top: 0,
+          left: 0,
+        }}
+      >
         <h1 style={{ color: "#fff" }}>Awesome React OrgChart 👥 🤼</h1>
         <p style={{ color: "#fff" }}>
           Renders large organization charts with multiple compaction/packing
@@ -157,69 +190,81 @@ export default class App extends Component<void, AppState> {
           </Dropdown>
         </ButtonToolbar>
         <br />
-        <div>
-          <OrgChart2
-            root={nodes[0]}
-            keyGetter={(node) => String(node.id)}
-            lineHorizontalStyle={{ borderTop: "2px solid #33385d" }}
-            lineVerticalStyle={{ borderLeft: "2px solid #33385d" }}
-            childNodesGetter={(node: Node) =>
-              this.isCollapsed(node)
-                ? []
-                : node.children
-                    .map((id: string) => nodes.find((node) => node.id === id))
-                    .filter(isNode)
-            }
-            layout={layout}
-            containerStyle={{ margin: "0 auto" }}
-            renderNode={(node) => (
-              <small>
-                <Card
-                  style={{
-                    width: 250,
-                    borderRadius: 8,
-                    border: "none",
-                    boxShadow: "0 3px 3px rgba(0,0,0,0.1)",
-                    background: node.color,
-                    color: "rgba(255,255,255,0.75)",
-                  }}
-                >
-                  <Card.Body>
-                    <Card.Title>{node.name}</Card.Title>
-                    <Card.Text>{node.description}</Card.Text>
-                    {node.children.length > 0 && (
-                      <Grid.Strict
-                        container
-                        spacing={1}
-                        alignItems="center"
-                        style={{
-                          color: "#fff",
-                          cursor: "pointer",
-                          fontWeight: "bold",
-                        }}
-                        onClick={() =>
-                          this.setCollapsed(node, !this.isCollapsed(node))
-                        }
-                      >
-                        <Grid item>
-                          {this.isCollapsed(node) ? (
-                            <IoIosArrowDown />
-                          ) : (
-                            <IoIosArrowUp />
-                          )}
-                        </Grid>
-                        <Grid item>
-                          {this.isCollapsed(node) ? "More" : "Less"}
-                        </Grid>
-                      </Grid.Strict>
-                    )}
-                  </Card.Body>
-                </Card>
-              </small>
-            )}
-          />
-        </div>
       </div>
+    );
+  }
+
+  render() {
+    const { layout, nodes } = this.state;
+
+    return (
+      <>
+        {this.renderHeader(true)}
+        {this.renderHeader(false)}
+        <OrgChart2
+          root={nodes[0]}
+          keyGetter={(node) => String(node.id)}
+          lineHorizontalStyle={{
+            borderTop: "2px solid rgba(255,255,255,0.15)",
+          }}
+          lineVerticalStyle={{ borderLeft: "2px solid rgba(255,255,255,0.15)" }}
+          childNodesGetter={(node: Node) =>
+            this.isCollapsed(node)
+              ? []
+              : node.children
+                  .map((id: string) => nodes.find((node) => node.id === id))
+                  .filter(isNode)
+          }
+          layout={layout}
+          containerStyle={{ margin: "20px auto", pointerEvents: "none" }}
+          renderNode={(node) => (
+            <small>
+              <Card
+                style={{
+                  width: 250,
+                  borderRadius: 8,
+                  border: "none",
+                  boxShadow: "0 3px 3px rgba(0,0,0,0.1)",
+                  background: node.color,
+                  color: "rgba(255,255,255,0.75)",
+                }}
+              >
+                <Card.Body>
+                  <Card.Title>{node.name}</Card.Title>
+                  <Card.Text>{node.description}</Card.Text>
+                  {node.children.length > 0 && (
+                    <Grid.Strict
+                      container
+                      spacing={1}
+                      alignItems="center"
+                      style={{
+                        color: "#fff",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                        pointerEvents: "all",
+                      }}
+                      onClick={() =>
+                        this.setCollapsed(node, !this.isCollapsed(node))
+                      }
+                    >
+                      <Grid item>
+                        {this.isCollapsed(node) ? (
+                          <IoIosArrowDown />
+                        ) : (
+                          <IoIosArrowUp />
+                        )}
+                      </Grid>
+                      <Grid item>
+                        {this.isCollapsed(node) ? "More" : "Less"}
+                      </Grid>
+                    </Grid.Strict>
+                  )}
+                </Card.Body>
+              </Card>
+            </small>
+          )}
+        />
+      </>
     );
   }
 }
