@@ -23,46 +23,13 @@ export default class NodeLayoutInfo {
   IsHidden: boolean = false;
   Connector: Connector | null = null;
 
-  _numberOfSiblings: number = 0;
-  _numberOfSiblingsRows: number = 0;
-  _numberOfSiblingsColumns: number = 0;
-
-  get NumberOfSiblings(): number {
-    return this._numberOfSiblings;
-  }
-  get NumberOfSiblingRows(): number {
-    return this._numberOfSiblingsRows;
-  }
-  get NumberOfSiblingColumns(): number {
-    return this._numberOfSiblingsColumns;
-  }
-  set NumberOfSiblings(value: number) {
-    this._numberOfSiblings = Math.floor(value);
-  }
-  set NumberOfSiblingRows(value: number) {
-    this._numberOfSiblingsRows = Math.floor(value);
-  }
-  set NumberOfSiblingColumns(value: number) {
-    this._numberOfSiblingsColumns = Math.floor(value);
-  }
-
+  NumberOfSiblings: number = 0;
+  NumberOfSiblingRows: number = 0;
+  NumberOfSiblingColumns: number = 0;
   Size = new Size(0, 0);
   TopLeft = new Point(0, 0);
   BranchExterior: Rect = new Rect(0, 0, 0, 0);
-
-  private _siblingsRowV: Dimensions | null = null;
-
-  get SiblingsRowV(): Dimensions {
-    if (this._siblingsRowV == null) {
-      throw Error("SiblingsRowV is null");
-    }
-
-    return this._siblingsRowV;
-  }
-
-  set SiblingsRowV(value: Dimensions) {
-    this._siblingsRowV = value;
-  }
+  SiblingsRowV: Dimensions = new Dimensions(0, 0);
 
   get Left(): number {
     if (this.TopLeft == null) {
