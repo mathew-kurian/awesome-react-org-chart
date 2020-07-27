@@ -1,4 +1,4 @@
-# Awesome React Org Chart 👥 🤼
+# Awesome React Org Chart 👥
 
 [![npm version](https://badge.fury.io/js/awesome-react-org-chart.svg)](https://badge.fury.io/js/awesome-react-org-chart)
 
