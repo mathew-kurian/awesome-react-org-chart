@@ -78,7 +78,7 @@ interface OrgChartState<T> {
   hidden: boolean;
 }
 
-export type RenderNodeContainerProps<T> = {
+export type NodeContainerRenderProps<T> = {
   "data-box-id": string;
   key: string;
   style: React.CSSProperties;
@@ -100,7 +100,7 @@ interface OrgChartProps<T> {
   renderNode: (node: T) => React.ReactElement;
   renderNodeContainer?: (
     node: T,
-    props: RenderNodeContainerProps<T>,
+    props: NodeContainerRenderProps<T>,
     context: NodeContainerRenderContext<T>
   ) => React.ReactElement;
   parentSpacing?: number;
@@ -628,8 +628,6 @@ export default class OrgChart<T> extends React.Component<
             left: 0,
             top: 0,
             transform: `translate3d(${left}px, ${top}px, 0)`,
-            visibility: hidden ? "hidden" : "visible",
-            pointerEvents: hidden ? "none" : "auto",
             position: "absolute",
             ...nodeContainerStyle,
           };
@@ -646,7 +644,15 @@ export default class OrgChart<T> extends React.Component<
           }
 
           return (
-            <div key={key} style={style} data-box-id={dataBoxId}>
+            <div
+              key={key}
+              style={{
+                ...style,
+                visibility: hidden ? "hidden" : "visible",
+                pointerEvents: hidden ? "none" : "auto",
+              }}
+              data-box-id={dataBoxId}
+            >
               {children}
             </div>
           );

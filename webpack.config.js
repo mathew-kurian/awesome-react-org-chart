@@ -18,7 +18,7 @@ module.exports = {
   },
   entry: {
     bundle: "./src/index.tsx",
-    demo: "./src/demo.ts",
+    spec: "./spec/spec.ts",
   },
   output: {
     path: path.join(__dirname, "public/scripts"),

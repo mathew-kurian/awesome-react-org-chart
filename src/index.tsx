@@ -1,14 +1,8 @@
 import React from "react";
 import { render } from "react-dom";
-import App from "./App";
+import Example from "./Example";
 
-const start = () =>
-  render(
-    <App>
-      <p>Welcome to the boilerplate</p>
-    </App>,
-    document.getElementById("root")
-  );
+const start = () => render(<Example />, document.getElementById("root"));
 
 if (["complete", "interactive"].includes(document.readyState)) {
   start();
