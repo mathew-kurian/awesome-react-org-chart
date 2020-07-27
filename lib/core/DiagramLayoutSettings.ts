@@ -41,20 +41,18 @@ export default class DiagramLayoutSettings {
   }
 
   RequireDefaultAssistantLayoutStrategy(): LayoutStrategyBase {
-    {
-      const id = this.DefaultAssistantLayoutStrategyId;
+    const id = this.DefaultAssistantLayoutStrategyId;
 
-      if (!id) {
-        throw new Error("DefaultLayoutStrategyId is null or not valid");
-      }
-
-      const result = this.LayoutStrategies.get(id);
-
-      if (!result) {
-        throw new Error("DefaultLayoutStrategyId is null or not valid");
-      }
-
-      return result;
+    if (!id) {
+      throw new Error("DefaultLayoutStrategyId is null or not valid");
     }
+
+    const result = this.LayoutStrategies.get(id);
+
+    if (!result) {
+      throw new Error("DefaultLayoutStrategyId is null or not valid");
+    }
+
+    return result;
   }
 }
