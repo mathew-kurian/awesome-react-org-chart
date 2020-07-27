@@ -61,6 +61,7 @@
     "faker": "^4.1.0",
     "fork-ts-checker-webpack-plugin": "^5.0.7",
     "react": "latest",
+    "react-animation-components": "^3.0.0",
     "react-bootstrap": "^1.2.2",
     "react-dom": "latest",
     "react-fast-grid": "^2.1.7",
