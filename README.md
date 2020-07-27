@@ -40,6 +40,12 @@ import OrgChart from "awesome-react-org-chart";
 />;
 ```
 
+## Animation
+
+The OrgChart uses `transform3d` to position items on the screen. CSS transitions along with some React/JavaScript can be used to make animations.
+
+![](./animation.gif)
+
 ## Credits
 
 [OrgChart](https://github.com/romanpolunin/OrgChart) by [@romanpolunin](https://github.com/romanpolunin)
