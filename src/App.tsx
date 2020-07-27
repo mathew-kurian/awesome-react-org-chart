@@ -160,9 +160,12 @@ export default class App extends Component<void, AppState> {
             <Button
               href="https://github.com/mathew-kurian/awesome-react-org-chart"
               style={{
-                fontSize: "1.6em",
+                fontWeight: "bold",
+                fontSize: "1em",
                 borderRadius: 50,
                 padding: "10px 30px",
+                letterSpacing: "1px",
+                textTransform: "uppercase",
               }}
               variant="outline-light"
             >

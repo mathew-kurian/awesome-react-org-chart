@@ -4,7 +4,7 @@ import Node from "./Node";
 import LayoutState from "./LayoutState";
 import Operation from "./Operation";
 import Point from "./Point";
-import Box from "./box";
+import Box from "./Box";
 import LayoutStrategyBase from "./LayoutStrategyBase";
 import LayoutLevel from "./LayoutLevel";
 import Func from "./Func";

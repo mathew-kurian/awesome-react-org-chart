@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "start": "node register.js",
-    "build": "export NODE_ENV=production; npx webpack --config webpack.config.js; npm run build-lib",
+    "build": "export NODE_ENV=production; npm run build-lib; npx webpack --config webpack.config.js; ",
     "watch": "export NODE_ENV=development; npx webpack --config webpack.config.js",
     "build-lib": "export NODE_ENV=production; npx tsc",
     "watch-lib": "export NODE_ENV=development; npx tsc-watch"

@@ -82,7 +82,7 @@ interface OrgChartProps<T> {
   lineHorizontalClassName?: string;
   lineVerticalStyle?: React.CSSProperties;
   lineHorizontalStyle?: React.CSSProperties;
-  layout?: LayoutType;
+  layout?: LayoutType | LayoutStrategyBase;
   containerStyle?: React.CSSProperties;
   renderNode: (node: T) => React.ReactElement;
   parentSpacing?: number;
@@ -300,7 +300,14 @@ export default class OrgChart<T> extends React.Component<
     this.createDiagram();
   }
 
-  private createDiagram(root: T = this.props.root) {
+  private createDiagram() {
+    const {
+      root,
+      layout,
+      parentSpacing = 40,
+      siblingSpacing = 30,
+    } = this.props;
+
     const dataSource = this.getDataSource(root);
     const boxContainer = new BoxContainer(dataSource);
     const diagram = new OrgChartDiagram<T>(dataSource);
@@ -308,7 +315,10 @@ export default class OrgChart<T> extends React.Component<
     diagram.Boxes = boxContainer;
 
     const strategies = OrgChart.assignStrategies(diagram);
-    const { parentSpacing = 40, siblingSpacing = 30 } = this.props;
+
+    if (layout instanceof LayoutStrategyBase) {
+      diagram.LayoutSettings.LayoutStrategies.set("custom", layout);
+    }
 
     for (const strategy of strategies) {
       strategy.ChildConnectorHookLength = parentSpacing / 2;
@@ -328,6 +338,8 @@ export default class OrgChart<T> extends React.Component<
       return OrgChart.getBranchOptimizerStackers(node);
     } else if (node.IsAssistantRoot) {
       return null;
+    } else if (layout instanceof LayoutStrategyBase) {
+      return "custom";
     } else {
       return layout;
     }
@@ -515,19 +527,19 @@ export default class OrgChart<T> extends React.Component<
     });
   }
 
-  private tryDrawDiagram(
-    diagram: OrgChartDiagram<T> | null = this.state.diagram
-  ) {
-    if (diagram == null) {
-      throw Error("Diagram is null");
-    }
+  // private tryDrawDiagram(
+  //   diagram: OrgChartDiagram<T> | null = this.state.diagram
+  // ) {
+  //   if (diagram == null) {
+  //     throw Error("Diagram is null");
+  //   }
 
-    this.drawDiagram(diagram);
-  }
+  //   this.drawDiagram(diagram);
+  // }
 
   componentDidUpdate(prevProps: OrgChartProps<T>) {
     if (this.props !== prevProps) {
-      this.createDiagram(prevProps.root);
+      this.createDiagram();
     }
   }
 
