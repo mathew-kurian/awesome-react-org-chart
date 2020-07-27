@@ -19,6 +19,18 @@ import LayoutStrategyBase from "./core/LayoutStrategyBase";
 
 const NOOP_SIZE = new Size(5, 5);
 
+const get3dOffset = (
+  position: number,
+  size: number | string,
+  containerSize: number
+): string => {
+  if (typeof size === "string") {
+    return position + "px";
+  }
+
+  return (position / containerSize) * 100 * (containerSize / size) + "%";
+};
+
 export interface Rect {
   top: number;
   left: number;
@@ -601,18 +613,6 @@ export default class OrgChart<T> extends React.Component<
     > = {
       vertical: lineVerticalStyle,
       horizontal: lineHorizontalStyle,
-    };
-
-    const get3dOffset = (
-      position: number,
-      size: number | string,
-      containerSize: number
-    ): string => {
-      if (typeof size === "string") {
-        return position + "px";
-      }
-
-      return (position / containerSize) * 100 * (containerSize / size) + "%";
     };
 
     return (

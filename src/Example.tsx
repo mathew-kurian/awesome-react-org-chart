@@ -25,7 +25,7 @@ export default class Example extends Component<{}, ExampleState> {
     collapsed: new WeakMap<Node, boolean>(),
   };
 
-  _header: React.RefObject<HTMLDivElement> = React.createRef();
+  private _header: React.RefObject<HTMLDivElement> = React.createRef();
 
   componentDidMount() {
     window.addEventListener("scroll", () => {
@@ -37,7 +37,7 @@ export default class Example extends Component<{}, ExampleState> {
     });
   }
 
-  setCollapsed(node: Node, isCollapsed: boolean) {
+  private setCollapsed(node: Node, isCollapsed: boolean) {
     const { collapsed } = this.state;
 
     collapsed.set(node, isCollapsed);
@@ -45,13 +45,13 @@ export default class Example extends Component<{}, ExampleState> {
     this.setState({ collapsed });
   }
 
-  isCollapsed(node: Node): boolean {
+  private isCollapsed(node: Node): boolean {
     const { collapsed } = this.state;
 
     return collapsed.get(node) || false;
   }
 
-  renderNodeContainer = (
+  private renderNodeContainer = (
     node: Node,
     props: NodeContainerRenderProps<Node>,
     context: NodeContainerRenderContext<Node>
@@ -64,7 +64,7 @@ export default class Example extends Component<{}, ExampleState> {
     />
   );
 
-  renderNode = (node: Node): React.ReactElement => {
+  private renderNode = (node: Node): React.ReactElement => {
     return (
       <small>
         <Card
@@ -109,37 +109,37 @@ export default class Example extends Component<{}, ExampleState> {
     );
   };
 
-  lineHorizontalStyle: React.CSSProperties = {
+  private lineHorizontalStyle: React.CSSProperties = {
     borderTop: "2px solid rgba(255,255,255,0.15)",
     transition: "800ms transform, 800ms width, 800ms height",
   };
 
-  lineVerticalStyle: React.CSSProperties = {
+  private lineVerticalStyle: React.CSSProperties = {
     borderLeft: "2px solid rgba(255,255,255,0.15)",
     transition: "800ms transform, 800ms width, 800ms height",
   };
 
-  containerStyle: React.CSSProperties = {
+  private containerStyle: React.CSSProperties = {
     margin: "20px auto",
     pointerEvents: "none",
     // transition: "800ms width, 800ms height",
   };
 
-  childNodesGetter = (node: Node) =>
+  private childNodesGetter = (node: Node) =>
     this.isCollapsed(node)
       ? []
       : node.children
           .map((id: string) => this.state.nodes.find((node) => node.id === id))
           .filter(isNode);
 
-  keyGetter = (node: Node) => String(node.id);
+  private keyGetter = (node: Node) => String(node.id);
 
-  onSelectLayout = (layout: LayoutType) =>
+  private onSelectLayout = (layout: LayoutType) =>
     this.setState({
       layout,
     });
 
-  onSelectNodeCount = (count: number) =>
+  private onSelectNodeCount = (count: number) =>
     this.setState({ nodes: generateNodes(count) });
 
   render() {

@@ -3,6 +3,7 @@ import {
   NodeContainerRenderContext,
   NodeContainerRenderProps,
 } from "../lib/OrgChart";
+import { Node } from "./generate-nodes";
 
 interface AnimatedNodeContainerProps {
   node: Node;
