@@ -38,6 +38,8 @@ function isNode(obj: any): obj is Node {
   return obj != null && Array.isArray((obj as Node).children);
 }
 
+const transition = "800ms transform, 800ms width, 800ms height";
+
 export default class App extends Component<void, AppState> {
   state = {
     layout: layouts[3],
@@ -220,7 +222,6 @@ export default class App extends Component<void, AppState> {
 
   render() {
     const { layout, nodes } = this.state;
-
     return (
       <>
         {this.renderHeader(true)}
@@ -228,10 +229,15 @@ export default class App extends Component<void, AppState> {
         <OrgChart
           root={nodes[0]}
           keyGetter={(node) => String(node.id)}
+          nodeContainerStyle={{ transition }}
           lineHorizontalStyle={{
             borderTop: "2px solid rgba(255,255,255,0.15)",
+            transition: transition,
           }}
-          lineVerticalStyle={{ borderLeft: "2px solid rgba(255,255,255,0.15)" }}
+          lineVerticalStyle={{
+            borderLeft: "2px solid rgba(255,255,255,0.15)",
+            transition: transition,
+          }}
           childNodesGetter={(node: Node) =>
             this.isCollapsed(node)
               ? []
@@ -240,7 +246,11 @@ export default class App extends Component<void, AppState> {
                   .filter(isNode)
           }
           layout={layout}
-          containerStyle={{ margin: "20px auto", pointerEvents: "none" }}
+          containerStyle={{
+            margin: "20px auto",
+            pointerEvents: "none",
+            transition,
+          }}
           renderNode={(node) => (
             <small>
               <Card

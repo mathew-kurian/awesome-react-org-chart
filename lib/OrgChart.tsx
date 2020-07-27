@@ -19,25 +19,30 @@ import LayoutStrategyBase from "./core/LayoutStrategyBase";
 
 const NOOP_SIZE = new Size(5, 5);
 
-interface Rect {
+export interface Rect {
   top: number;
   left: number;
   height: number | string;
   width: number | string;
 }
 
-interface Line {
+export interface Line {
   rect: Rect;
   direction: "vertical" | "horizontal";
   assistant: boolean;
+  key: string;
 }
 
-interface NodeRenderInfo<T> {
+export interface NodeRenderContext<T> {
   top: number;
   left: number;
   data: T;
-  id: number;
-  collapsed: boolean;
+  dataId: string;
+  boxId: number;
+}
+
+export interface NodeContainerRenderContext<T> {
+  hidden: boolean;
 }
 
 export type LayoutType =
@@ -69,9 +74,16 @@ interface OrgChartState<T> {
   width: number;
   height: number;
   diagram: OrgChartDiagram<T> | null;
-  nodes: NodeRenderInfo<T>[];
+  nodes: NodeRenderContext<T>[];
   hidden: boolean;
 }
+
+export type RenderNodeContainerProps<T> = {
+  "data-box-id": string;
+  key: string;
+  style: React.CSSProperties;
+  children: React.ReactNode;
+};
 
 interface OrgChartProps<T> {
   root: T;
@@ -84,7 +96,13 @@ interface OrgChartProps<T> {
   lineHorizontalStyle?: React.CSSProperties;
   layout?: LayoutType | LayoutStrategyBase;
   containerStyle?: React.CSSProperties;
+  nodeContainerStyle?: React.CSSProperties;
   renderNode: (node: T) => React.ReactElement;
+  renderNodeContainer?: (
+    node: T,
+    props: RenderNodeContainerProps<T>,
+    context: NodeContainerRenderContext<T>
+  ) => React.ReactElement;
   parentSpacing?: number;
   siblingSpacing?: number;
 }
@@ -355,7 +373,7 @@ export default class OrgChart<T> extends React.Component<
 
     if (!computeSize) {
       const dataSource = diagram.DataSource;
-      const nodeRenderInfos: NodeRenderInfo<T>[] = [];
+      const contexts: NodeRenderContext<T>[] = [];
 
       for (const box of diagram.Boxes.BoxesById.values()) {
         if (!box.IsDataBound) {
@@ -365,19 +383,19 @@ export default class OrgChart<T> extends React.Component<
         const id = box.Id;
         const data = dataSource.GetDataItemFunc(box.DataId || "").data;
 
-        nodeRenderInfos.push({
+        contexts.push({
           left: 0,
           top: 0,
           data,
-          id: id,
-          collapsed: box.IsCollapsed,
+          dataId: box.DataId || String(id),
+          boxId: id,
         });
       }
 
       this.setState(
         {
           hidden: true,
-          nodes: nodeRenderInfos,
+          nodes: contexts,
         },
         () => this.drawDiagram(diagram, true)
       );
@@ -408,7 +426,7 @@ export default class OrgChart<T> extends React.Component<
 
     if (computeSize) {
       state.BoxSizeFunc = (dataId: string | null) => {
-        if (!dataId) {
+        if (dataId == null) {
           return NOOP_SIZE;
         }
 
@@ -441,7 +459,7 @@ export default class OrgChart<T> extends React.Component<
     const offsetX = -diagramBoundary.Left;
     const offsetY = -diagramBoundary.Top;
 
-    const nodes: NodeRenderInfo<T>[] = [];
+    const contexts: NodeRenderContext<T>[] = [];
     const lines: Line[] = [];
 
     diagram.VisualTree.IterateParentFirst((node: Node) => {
@@ -462,19 +480,21 @@ export default class OrgChart<T> extends React.Component<
         const dataId = box.DataId || "";
         const { data } = diagram.DataSource.GetDataItemFunc(dataId);
 
-        nodes.push({
+        contexts.push({
           left: x,
           top: y,
           data,
-          id: box.Id,
-          collapsed: box.IsCollapsed,
+          dataId: dataId || String(box.Id),
+          boxId: box.Id,
         });
       }
 
       // Render connectors
       if (node.State.Connector != null) {
-        for (let ix = 0; ix < node.State.Connector.Segments.length; ix++) {
-          const edge = node.State.Connector.Segments[ix];
+        const segments = node.State.Connector.Segments;
+
+        for (let ix = 0; ix < segments.length; ix++) {
+          const edge = segments[ix];
           let direction: "horizontal" | "vertical" = "horizontal";
           let assistant = node.IsAssistantRoot;
           let topLeft;
@@ -505,6 +525,7 @@ export default class OrgChart<T> extends React.Component<
           lines.push({
             direction,
             assistant,
+            key: box.DataId + "-" + ix,
             rect: {
               left: topLeft.X + offsetX,
               top: topLeft.Y + offsetY,
@@ -522,7 +543,7 @@ export default class OrgChart<T> extends React.Component<
       width: diagramBoundary.Size.Width,
       height: diagramBoundary.Size.Height,
       lines,
-      nodes,
+      nodes: contexts,
       hidden: false,
     });
   }
@@ -552,6 +573,8 @@ export default class OrgChart<T> extends React.Component<
       lineVerticalStyle,
       containerStyle,
       renderNode,
+      renderNodeContainer,
+      nodeContainerStyle,
     } = this.props;
 
     const lineClassNames: Record<Line["direction"], string | undefined> = {
@@ -572,34 +595,62 @@ export default class OrgChart<T> extends React.Component<
         style={{ width, height, position: "relative", ...containerStyle }}
         ref={this._container}
       >
-        {lines.map(({ rect, assistant, direction }, index) => (
-          <div
-            key={index}
-            data-line-assistant={assistant}
-            data-line-direction={direction}
-            className={lineClassNames[direction]}
-            style={{
-              ...rect,
-              position: "absolute",
-              ...lineStyles[direction],
-              opacity: hidden ? 0 : 1,
-            }}
-          />
-        ))}
-        {nodes.map(({ top, left, id, data }, index) => (
-          <div
-            key={index}
-            style={{
-              top,
-              left,
-              opacity: hidden ? 0 : 1,
-              position: "absolute",
-            }}
-            data-box-id={id}
-          >
-            {renderNode(data)}
-          </div>
-        ))}
+        {lines.map(
+          ({
+            rect: { width, height, left, top },
+            assistant,
+            direction,
+            key,
+          }) => (
+            <div
+              key={key}
+              data-line-assistant={assistant}
+              data-line-direction={direction}
+              className={lineClassNames[direction]}
+              style={{
+                left: 0,
+                top: 0,
+                width,
+                height,
+                transform: `translate3d(${left}px, ${top}px, 0)`,
+                position: "absolute",
+                visibility: hidden ? "hidden" : "visible",
+                pointerEvents: "none",
+                ...lineStyles[direction],
+              }}
+            />
+          )
+        )}
+        {nodes.map((context) => {
+          const { top, left, dataId: key, boxId: dataBoxId, data } = context;
+          const children = renderNode(data);
+          const style: React.CSSProperties = {
+            left: 0,
+            top: 0,
+            transform: `translate3d(${left}px, ${top}px, 0)`,
+            visibility: hidden ? "hidden" : "visible",
+            pointerEvents: hidden ? "none" : "auto",
+            position: "absolute",
+            ...nodeContainerStyle,
+          };
+
+          if (typeof renderNodeContainer === "function") {
+            const props = {
+              children,
+              style,
+              key,
+              "data-box-id": String(dataBoxId),
+            };
+
+            return renderNodeContainer(data, props, { hidden });
+          }
+
+          return (
+            <div key={key} style={style} data-box-id={dataBoxId}>
+              {children}
+            </div>
+          );
+        })}
       </div>
     );
   }
