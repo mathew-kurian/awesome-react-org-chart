@@ -8,7 +8,7 @@ Supports large organization charts with multiple compaction/packing techniques t
 
 ![](./screenshot.png)
 
-```jsx
+```tsx
 import OrgChart from "awesome-react-org-chart";
 
 // `Card` class is used for demo purposes
@@ -17,17 +17,16 @@ import OrgChart from "awesome-react-org-chart";
   root={nodes[0]}
   keyGetter={(node) => String(node.id)}
   childNodesGetter={(node) =>
-    node.children
-      // @ts-ignore
-      .map((id: string | number) => nodes.find((node) => node.id === id))
-      .filter(isNode)
+    node.children.map((id: string | number) =>
+      nodes.find((node) => node.id === id)
+    )
   }
   layout={layout}
   connectorHorizontalStyle={{ borderTop: "1px solid red" }}
   connectorVerticalStyle={{ borderLeft: "1px solid red" }}
   sizeGetter={(node, domElement) => domElement.getBoundingClientRect()}
   containerStyle={{ margin: "0 auto" }}
-  renderNode={(node, { setCollapsed, collapsed }) => (
+  renderNode={(node) => (
     <Card style={{ width: "18rem" }}>
       <Card.Body>
         <Card.Title>ID #{node.name}</Card.Title>
@@ -35,11 +34,6 @@ import OrgChart from "awesome-react-org-chart";
           Some quick example text to build on the card title and make up the
           bulk of the card's content.
         </Card.Text>
-        {node.children.length > 0 && (
-          <Button variant="primary" onClick={() => setCollapsed(!collapsed)}>
-            {collapsed ? "Expand" : "Collapse"}
-          </Button>
-        )}
       </Card.Body>
     </Card>
   )}
