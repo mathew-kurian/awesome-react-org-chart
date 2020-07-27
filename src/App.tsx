@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Dropdown from "react-bootstrap/Dropdown";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
-import OrgChart2, { LayoutType } from "../lib/OrgChart2";
+import OrgChart, { LayoutType } from "../lib/OrgChart";
 import TestDataSource from "../lib/test/TestDataSource";
 import TestDataGen from "../lib/test/TestDataGen";
 import faker from "faker";
@@ -146,49 +144,72 @@ export default class App extends Component<void, AppState> {
           width: "100%",
           top: 0,
           left: 0,
+          textAlign: "center",
         }}
       >
-        <h1 style={{ color: "#fff" }}>Awesome React OrgChart 👥 🤼</h1>
+        <h1 style={{ color: "#fff" }}>Awesome React OrgChart 👥</h1>
         <p style={{ color: "#fff" }}>
           Renders large organization charts with multiple compaction/packing
           techniques to improve readability and accessibility. Select a layout
           engine for the org chart
         </p>
         <br />
-        <ButtonToolbar>
-          <Dropdown style={{ marginRight: 10 }}>
-            <Dropdown.Toggle variant="success">
-              Select Layout: {layout}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {layouts.map((layout) => (
-                <Dropdown.Item
-                  key={layout}
-                  onClick={() => this.setState({ layout })}
-                >
-                  {layout}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-          <Dropdown>
-            <Dropdown.Toggle variant="info">
-              Select Node Count: {nodes.length}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {[20, 50, 100, 200, 300, 500, 1000].map((count) => (
-                <Dropdown.Item
-                  key={count}
-                  onClick={() =>
-                    this.setState({ nodes: App.generateData(count) })
-                  }
-                >
-                  {count}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-        </ButtonToolbar>
+        <br />
+        <Grid container justify="center">
+          <Grid item>
+            <Button
+              href="https://github.com/mathew-kurian/awesome-react-org-chart"
+              style={{
+                fontSize: "1.6em",
+                borderRadius: 50,
+                padding: "10px 30px",
+              }}
+              variant="outline-light"
+            >
+              Fork on Github
+            </Button>
+          </Grid>
+        </Grid>
+        <br />
+        <Grid container justify="center" spacing={2}>
+          <Grid item>
+            <Dropdown>
+              <Dropdown.Toggle variant="success">
+                Select Layout: {layout}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {layouts.map((layout) => (
+                  <Dropdown.Item
+                    key={layout}
+                    onClick={() => this.setState({ layout })}
+                  >
+                    {layout}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          </Grid>
+          <Grid item>
+            <Dropdown>
+              <Dropdown.Toggle variant="info">
+                Select Node Count: {nodes.length}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {[20, 50, 100, 200, 300, 500, 1000].map((count) => (
+                  <Dropdown.Item
+                    key={count}
+                    onClick={() =>
+                      this.setState({ nodes: App.generateData(count) })
+                    }
+                  >
+                    {count}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          </Grid>
+        </Grid>
+        <br />
         <br />
       </div>
     );
@@ -201,7 +222,7 @@ export default class App extends Component<void, AppState> {
       <>
         {this.renderHeader(true)}
         {this.renderHeader(false)}
-        <OrgChart2
+        <OrgChart
           root={nodes[0]}
           keyGetter={(node) => String(node.id)}
           lineHorizontalStyle={{
