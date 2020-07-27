@@ -34,8 +34,7 @@ export interface Line {
 }
 
 export interface NodeRenderContext<T> {
-  top: number;
-  left: number;
+  rect: Rect;
   data: T;
   dataId: string;
   boxId: number;
@@ -384,8 +383,12 @@ export default class OrgChart<T> extends React.Component<
         const data = dataSource.GetDataItemFunc(box.DataId || "").data;
 
         contexts.push({
-          left: 0,
-          top: 0,
+          rect: {
+            left: 0,
+            top: 0,
+            width: "auto",
+            height: "auto",
+          },
           data,
           dataId: box.DataId || String(id),
           boxId: id,
@@ -481,8 +484,12 @@ export default class OrgChart<T> extends React.Component<
         const { data } = diagram.DataSource.GetDataItemFunc(dataId);
 
         contexts.push({
-          left: x,
-          top: y,
+          rect: {
+            left: x,
+            top: y,
+            width: box.Size.Width,
+            height: box.Size.Height,
+          },
           data,
           dataId: dataId || String(box.Id),
           boxId: box.Id,
@@ -565,7 +572,13 @@ export default class OrgChart<T> extends React.Component<
   }
 
   render() {
-    const { lines, width, height, nodes, hidden } = this.state;
+    const {
+      lines,
+      width: containerWidth,
+      height: containerHeight,
+      nodes,
+      hidden,
+    } = this.state;
     const {
       lineVerticalClassName,
       lineHorizontalClassName,
@@ -590,9 +603,26 @@ export default class OrgChart<T> extends React.Component<
       horizontal: lineHorizontalStyle,
     };
 
+    const get3dOffset = (
+      position: number,
+      size: number | string,
+      containerSize: number
+    ): string => {
+      if (typeof size === "string") {
+        return position + "px";
+      }
+
+      return (position / containerSize) * 100 * (containerSize / size) + "%";
+    };
+
     return (
       <div
-        style={{ width, height, position: "relative", ...containerStyle }}
+        style={{
+          width: containerWidth,
+          height: containerHeight,
+          position: "relative",
+          ...containerStyle,
+        }}
         ref={this._container}
       >
         {lines.map(
@@ -622,12 +652,21 @@ export default class OrgChart<T> extends React.Component<
           )
         )}
         {nodes.map((context) => {
-          const { top, left, dataId: key, boxId: dataBoxId, data } = context;
+          const {
+            rect: { top, left, width, height },
+            dataId: key,
+            boxId: dataBoxId,
+            data,
+          } = context;
           const children = renderNode(data);
           const style: React.CSSProperties = {
             left: 0,
             top: 0,
-            transform: `translate3d(${left}px, ${top}px, 0)`,
+            transform: `translate3d(${get3dOffset(
+              left,
+              width,
+              containerWidth
+            )}, ${get3dOffset(top, height, containerHeight)}, 0)`,
             position: "absolute",
             ...nodeContainerStyle,
           };
