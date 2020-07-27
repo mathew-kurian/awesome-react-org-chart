@@ -4,7 +4,7 @@
 
 Supports large organization charts with multiple compaction/packing techniques to improve readability and accessibility.
 
-## Example
+## [Example](https://mathew-kurian.github.io/awesome-react-org-chart/)
 
 ![](./screenshot.png)
 

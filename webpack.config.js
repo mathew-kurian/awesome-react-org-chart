@@ -2,6 +2,7 @@ const path = require("path");
 const webpack = require("webpack");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const { ESBuildPlugin } = require("awesome-esbuild-loader");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -15,13 +16,13 @@ module.exports = {
     modules: ["node_modules"],
     extensions: [".ts", ".tsx", ".js", ".jsx"],
   },
-  entry: ["./src/index.tsx"],
+  entry: {
+    bundle: "./src/index.tsx",
+    demo: "./src/demo.ts",
+  },
   output: {
     path: path.join(__dirname, "public/scripts"),
-    filename: "bundle.js",
-  },
-  optimization: {
-    minimize: isProduction,
+    filename: "[name].js",
   },
   stats: "minimal",
   module: {
@@ -40,14 +41,16 @@ module.exports = {
             target: "es2015", // default, or 'es20XX', 'esnext'
             jsxFactory: "React.createElement",
             jsxFragment: "React.Fragment",
-            sourceMap: !isProduction, // Enable sourcemap
-            minify: isProduction,
           },
         },
       },
     ],
   },
-  devtool: "false",
+  devtool: "source-map",
+  optimization: {
+    minimize: isProduction,
+    minimizer: [new TerserPlugin()],
+  },
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
     new webpack.NamedModulesPlugin(),

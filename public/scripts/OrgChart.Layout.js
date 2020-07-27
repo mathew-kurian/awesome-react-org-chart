@@ -1,7 +1,3 @@
-//@ts-nocheck
-
-import { Bridge, System } from './bridge';
-
 /**
  * @version 1.0.0.0
  * @author Roman Polunin
@@ -9,9 +5,7 @@ import { Bridge, System } from './bridge';
  * @compiler Bridge.NET 15.6.0
  */
 Bridge.assembly("OrgChart.Layout", function ($asm, globals) {
-  var OrgChart = (Bridge.global.OrgChart = {});
-
-  ("use strict");
+  "use strict";
 
   /** @namespace OrgChart.Annotations */
 
@@ -283,6 +277,10 @@ Bridge.assembly("OrgChart.Layout", function ($asm, globals) {
     Prepare: function (node) {
       this.Left.clear();
       this.Right.clear();
+
+      // if (node.getState().Size.Width == null) {
+      // console.log(node.getState().Size, node.getState().TopLeft);
+      // }
 
       // adjust the top edge to fit the logical grid
       this.setBoundingRect(
@@ -6753,7 +6751,6 @@ Bridge.assembly("OrgChart.Layout", function ($asm, globals) {
          * @return  {void}
          */
         Date1: null,
-        Data: null,
       },
       alias: [
         "getId",
