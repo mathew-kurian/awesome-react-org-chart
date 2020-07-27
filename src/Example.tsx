@@ -18,6 +18,39 @@ interface ExampleState {
   collapsed: WeakMap<Node, boolean>;
 }
 
+const CollapsedCards = () => (
+  <>
+    <Card
+      style={{
+        top: "-4%",
+        height: "92%",
+        left: "-4%",
+        width: "108%",
+        borderRadius: 8,
+        border: "none",
+        position: "absolute",
+        boxShadow: "0 3px 3px rgba(0,0,0,0.2)",
+        background: "#fe3efa",
+        color: "rgba(255,255,255,0.75)",
+      }}
+    />
+    <Card
+      style={{
+        top: "-2%",
+        height: "96%",
+        left: "-2%",
+        width: "104%",
+        borderRadius: 8,
+        border: "none",
+        position: "absolute",
+        boxShadow: "0 3px 3px rgba(0,0,0,0.2)",
+        background: "#fea83e",
+        color: "rgba(255,255,255,0.75)",
+      }}
+    />
+  </>
+);
+
 export default class Example extends Component<{}, ExampleState> {
   state = {
     layout: "fishbone2" as LayoutType,
@@ -65,14 +98,18 @@ export default class Example extends Component<{}, ExampleState> {
   );
 
   private renderNode = (node: Node): React.ReactElement => {
+    const collapsed = this.isCollapsed(node);
+    const collapsedCards = collapsed && <CollapsedCards />;
+
     return (
-      <small>
+      <div style={{ position: "relative", fontSize: "0.7em" }}>
+        {collapsedCards}
         <Card
           style={{
             width: 250,
             borderRadius: 8,
             border: "none",
-            boxShadow: "0 3px 3px rgba(0,0,0,0.1)",
+            boxShadow: "0 3px 3px rgba(0,0,0,0.2)",
             background: node.color,
             color: "rgba(255,255,255,0.75)",
           }}
@@ -91,21 +128,17 @@ export default class Example extends Component<{}, ExampleState> {
                   fontWeight: "bold",
                   pointerEvents: "all",
                 }}
-                onClick={() => this.setCollapsed(node, !this.isCollapsed(node))}
+                onClick={() => this.setCollapsed(node, !collapsed)}
               >
                 <Grid item>
-                  {this.isCollapsed(node) ? (
-                    <IoIosArrowDown />
-                  ) : (
-                    <IoIosArrowUp />
-                  )}
+                  {collapsed ? <IoIosArrowDown /> : <IoIosArrowUp />}
                 </Grid>
-                <Grid item>{this.isCollapsed(node) ? "More" : "Less"}</Grid>
+                <Grid item>{collapsed ? "More" : "Less"}</Grid>
               </Grid.Strict>
             )}
           </Card.Body>
         </Card>
-      </small>
+      </div>
     );
   };
 
