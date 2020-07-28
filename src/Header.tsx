@@ -70,6 +70,7 @@ export default React.forwardRef<HTMLDivElement, HeaderProps>(
                 letterSpacing: "1px",
                 textTransform: "uppercase",
               }}
+              target="_blank"
               variant="outline-light"
             >
               Fork on Github

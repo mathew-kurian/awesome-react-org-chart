@@ -2,7 +2,7 @@ import React from "react";
 import {
   NodeContainerRenderContext,
   NodeContainerRenderProps,
-} from "../lib/OrgChart";
+} from "../dist/OrgChart";
 import { Node } from "./generate-nodes";
 
 interface AnimatedNodeContainerProps {

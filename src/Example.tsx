@@ -5,7 +5,7 @@ import OrgChart, {
   LayoutType,
   NodeContainerRenderContext,
   NodeContainerRenderProps,
-} from "../lib/OrgChart";
+} from "../dist/OrgChart";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Grid from "react-fast-grid";
 import generateNodes, { Node, isNode } from "./generate-nodes";
