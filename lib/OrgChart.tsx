@@ -777,8 +777,8 @@ export default class OrgChart<T> extends React.Component<
               }
 
               // props.style = { ...props.style };
-              // props.style.visibility = hidden ? "hidden" : "visible";
-              // props.style.pointerEvents = hidden ? "none" : "auto";
+              props.style.visibility = hidden ? "hidden" : "visible";
+              props.style.pointerEvents = hidden ? "none" : "auto";
 
               return <div {...props} />;
             }
