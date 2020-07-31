@@ -31,7 +31,7 @@ export default class AnimatedNodeContainer<T> extends React.Component<
   static getDerivedStateFromProps<T>(
     {
       context,
-      defaultTransition = "transform 800ms",
+      defaultTransition = "transform 800ms, opacity 800ms",
       entranceTransition = "opacity 800ms",
     }: AnimatedNodeContainerProps<T>,
     state: AnimatedNodeContainerState

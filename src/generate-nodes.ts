@@ -8,12 +8,13 @@ export interface Node {
   name: string;
   description: string;
   color: string;
+  isAssistant?: boolean;
 }
 
 export function isNode(obj: any): obj is Node {
   return obj != null && Array.isArray((obj as Node).children);
 }
-const linearLayout: Node[] = [
+const simpleData: Node[] = [
   { id: "0", children: ["1", "2"], name: "0", description: "", color: "black" },
   {
     id: "1",
@@ -45,7 +46,7 @@ const linearLayout: Node[] = [
   { id: "10", children: [], name: "10", description: "", color: "black" },
 ];
 
-export { linearLayout };
+export { simpleData };
 
 export default (count: number) => {
   const percentAssistants = 0;
@@ -73,6 +74,7 @@ export default (count: number) => {
       name: card.name,
       description: faker.hacker.phrase(),
       color: colors[colorIndex],
+      isAssistant: dataSource.GetDataItem(id).IsAssistant,
     });
   }
 

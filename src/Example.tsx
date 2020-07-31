@@ -62,7 +62,7 @@ export default class Example extends Component<{}, ExampleState> {
       node={node}
       props={props}
       context={context}
-      defaultTransition="transform 800ms"
+      defaultTransition="opacity 800ms, transform 800ms"
       entranceTransition="opacity 800ms"
     />
   );
@@ -110,6 +110,10 @@ export default class Example extends Component<{}, ExampleState> {
         </Card>
       </div>
     );
+  };
+
+  private isAssistantGetter = (node: Node): boolean => {
+    return !!node.isAssistant;
   };
 
   private lineHorizontalStyle: React.CSSProperties = {
@@ -172,6 +176,7 @@ export default class Example extends Component<{}, ExampleState> {
           lineHorizontalStyle={this.lineHorizontalStyle}
           lineVerticalStyle={this.lineVerticalStyle}
           // optional
+          isAssistantGetter={this.isAssistantGetter}
           layout={layout}
           containerStyle={this.containerStyle}
           renderNodeContainer={this.renderNodeContainer}

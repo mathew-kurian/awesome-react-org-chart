@@ -38,21 +38,29 @@ export interface BoundaryRect extends Rect {
   branchLeft: number;
 }
 
-export interface Line {
+export interface LineRenderContext<T> {
   rect: CSSRect;
   direction: "vertical" | "horizontal";
   assistant: boolean;
-  key: string;
+  data: T;
+  dataId: string;
+  boxId: number;
+  index: number;
 }
 
 export interface NodeRenderContext<T> {
   rect: CSSRect;
   data: T;
+  assistant: boolean;
   dataId: string;
   boxId: number;
 }
 
 export interface NodeContainerRenderContext<T> {
+  hidden: boolean;
+}
+
+export interface NodeLineRenderContext<T> {
   hidden: boolean;
 }
 
@@ -87,15 +95,27 @@ export type NodeContainerRenderProps<T> = {
   children: React.ReactNode;
 };
 
+export type NodeLineRenderProps<T> = {
+  "data-line-assistant": boolean;
+  "data-line-direction": LineRenderContext<T>["direction"];
+  className?: string;
+  style: React.CSSProperties;
+  key: string;
+};
+
+export type AssistantLayoutType = LayoutType | "assistants";
+
 interface OrgChartProps<T> {
   root: T;
   keyGetter: (node: T) => string;
   childNodesGetter: (node: T) => T[];
+  isAssistantGetter?: (node: T) => boolean;
   lineVerticalClassName?: string;
   lineHorizontalClassName?: string;
   lineVerticalStyle?: React.CSSProperties;
   lineHorizontalStyle?: React.CSSProperties;
   layout?: LayoutType | LayoutStrategyBase;
+  assistantLayout?: AssistantLayoutType | LayoutStrategyBase;
   containerStyle?: React.CSSProperties;
   nodeContainerStyle?: React.CSSProperties;
   renderNode: (node: T) => React.ReactElement;
@@ -104,13 +124,18 @@ interface OrgChartProps<T> {
     props: NodeContainerRenderProps<T>,
     context: NodeContainerRenderContext<T>
   ) => React.ReactElement;
+  renderNodeLine?: (
+    node: T,
+    props: NodeLineRenderProps<T>,
+    context: NodeLineRenderContext<T>
+  ) => React.ReactElement;
   parentSpacing?: number;
   siblingSpacing?: number;
   debug?: boolean;
 }
 
 interface OrgChartState<T> {
-  lines: Line[];
+  lines: LineRenderContext<T>[];
   width: number;
   height: number;
   diagram: OrgChartDiagram<T> | null;
@@ -126,7 +151,7 @@ export default class OrgChart<T> extends React.Component<
   OrgChartState<T>
 > {
   state: OrgChartState<T> = {
-    lines: Array<Line>(),
+    lines: Array<LineRenderContext<T>>(),
     width: 0,
     height: 0,
     diagram: null,
@@ -239,10 +264,10 @@ export default class OrgChart<T> extends React.Component<
   }
 
   private static getDataSource<T>(
-    root: T,
-    childNodesGetter: (node: T) => T[],
-    keyGetter: (node: T) => string
+    props: OrgChartProps<T>
   ): IChartDataSource<OrgChartDataItem<T>> {
+    const { root, childNodesGetter, keyGetter, isAssistantGetter } = props;
+
     const items: Map<string, OrgChartDataItem<T>> = new Map();
     const sortedKeys: string[] = [];
     const processNode = (node: T, parentKey: string | null = null) => {
@@ -260,8 +285,10 @@ export default class OrgChart<T> extends React.Component<
 
       sortedKeys.push(key);
 
+      const emphasized = isAssistantGetter ? isAssistantGetter(node) : false;
+
       items.set(key, {
-        IsAssistant: false,
+        IsAssistant: emphasized,
         Id: key,
         data: node,
         parentKey,
@@ -373,20 +400,13 @@ export default class OrgChart<T> extends React.Component<
 
   private static createDiagram<T>(props: OrgChartProps<T>) {
     const {
-      root,
       layout,
+      assistantLayout,
       parentSpacing = 40,
       siblingSpacing = 30,
-      childNodesGetter,
-      keyGetter,
     } = props;
 
-    const dataSource = OrgChart.getDataSource(
-      root,
-      childNodesGetter,
-      keyGetter
-    );
-
+    const dataSource = OrgChart.getDataSource(props);
     const boxContainer = new BoxContainer(dataSource);
     const diagram = new OrgChartDiagram<T>(dataSource);
 
@@ -396,6 +416,13 @@ export default class OrgChart<T> extends React.Component<
 
     if (layout instanceof LayoutStrategyBase) {
       diagram.LayoutSettings.LayoutStrategies.set("custom", layout);
+    }
+
+    if (assistantLayout instanceof LayoutStrategyBase) {
+      diagram.LayoutSettings.LayoutStrategies.set(
+        "assistantCustom",
+        assistantLayout
+      );
     }
 
     for (const strategy of strategies) {
@@ -410,12 +437,18 @@ export default class OrgChart<T> extends React.Component<
   private onComputeBranchOptimizer = (node: Node): string | null => {
     const { layout = "linear" } = this.props;
 
-    if (layout === "smart") {
+    if (node.IsAssistantRoot) {
+      const { assistantLayout = "assistants" } = this.props;
+
+      if (assistantLayout instanceof LayoutStrategyBase) {
+        return "assistantCustom";
+      } else {
+        return assistantLayout;
+      }
+    } else if (layout === "smart") {
       return OrgChart.getBranchOptimizerSmart(node);
     } else if (layout === "stackers") {
       return OrgChart.getBranchOptimizerStackers(node);
-    } else if (node.IsAssistantRoot) {
-      return null;
     } else if (layout instanceof LayoutStrategyBase) {
       return "custom";
     } else {
@@ -464,8 +497,11 @@ export default class OrgChart<T> extends React.Component<
         data,
         dataId: box.DataId || String(id),
         boxId: id,
+        assistant: box.IsAssistant,
       });
     }
+
+    nodes.sort((a, b) => a.boxId - b.boxId);
 
     return { hidden: true, nodes };
   }
@@ -550,8 +586,8 @@ export default class OrgChart<T> extends React.Component<
     const offsetX = -diagramBoundary.Left;
     const offsetY = -diagramBoundary.Top;
 
-    const contexts: NodeRenderContext<T>[] = [];
-    const lines: Line[] = [];
+    const nodes: NodeRenderContext<T>[] = [];
+    const lines: LineRenderContext<T>[] = [];
     const boundaries: BoundaryRect[] = [];
 
     diagram.VisualTree.IterateParentFirst((node: Node) => {
@@ -561,39 +597,42 @@ export default class OrgChart<T> extends React.Component<
 
       const box = node.Element;
 
-      if (box.IsDataBound) {
-        // All boxes have already been rendered before the chart layout,
-        // to have all box sizes available before layout.
-        // So now we only have to position them.
-        // Connectors, however, are not rendered until layout is complete (see next block).
+      if (!box.IsDataBound) {
+        return true;
+      }
 
-        const x = node.State.TopLeft.X + offsetX;
-        const y = node.State.TopLeft.Y + offsetY;
-        const dataId = box.DataId || "";
-        const { data } = diagram.DataSource.GetDataItemFunc(dataId);
+      // All boxes have already been rendered before the chart layout,
+      // to have all box sizes available before layout.
+      // So now we only have to position them.
+      // Connectors, however, are not rendered until layout is complete (see next block).
 
-        contexts.push({
-          rect: {
-            left: x,
-            top: y,
-            width: box.Size.Width,
-            height: box.Size.Height,
-          },
-          data,
-          dataId: dataId || String(box.Id),
-          boxId: box.Id,
+      const x = node.State.TopLeft.X + offsetX;
+      const y = node.State.TopLeft.Y + offsetY;
+      const dataId = box.DataId || "";
+      const { data } = diagram.DataSource.GetDataItemFunc(dataId);
+
+      nodes.push({
+        rect: {
+          left: x,
+          top: y,
+          width: box.Size.Width,
+          height: box.Size.Height,
+        },
+        data,
+        dataId: dataId || String(box.Id),
+        boxId: box.Id,
+        assistant: box.IsAssistant,
+      });
+
+      if (debug) {
+        boundaries.push({
+          branchLeft: node.State.BranchExterior.Left,
+          branchTop: node.State.BranchExterior.Top,
+          left: node.State.BranchExterior.Left + offsetX,
+          top: node.State.BranchExterior.Top + offsetY,
+          width: node.State.BranchExterior.Size.Width,
+          height: node.State.BranchExterior.Size.Height,
         });
-
-        if (debug) {
-          boundaries.push({
-            branchLeft: node.State.BranchExterior.Left,
-            branchTop: node.State.BranchExterior.Top,
-            left: node.State.BranchExterior.Left + offsetX,
-            top: node.State.BranchExterior.Top + offsetY,
-            width: node.State.BranchExterior.Size.Width,
-            height: node.State.BranchExterior.Size.Height,
-          });
-        }
       }
 
       // Render connectors
@@ -603,7 +642,7 @@ export default class OrgChart<T> extends React.Component<
         for (let ix = 0; ix < segments.length; ix++) {
           const edge = segments[ix];
           let direction: "horizontal" | "vertical" = "horizontal";
-          let assistant = node.IsAssistantRoot;
+          let assistant = box.IsAssistant;
           let topLeft;
           let width = 0;
           let height = 0;
@@ -632,7 +671,10 @@ export default class OrgChart<T> extends React.Component<
           lines.push({
             direction,
             assistant,
-            key: box.DataId + "-" + ix,
+            data,
+            dataId,
+            boxId: box.Id,
+            index: ix,
             rect: {
               left: topLeft.X + offsetX,
               top: topLeft.Y + offsetY,
@@ -650,7 +692,7 @@ export default class OrgChart<T> extends React.Component<
       width: diagramBoundary.Size.Width,
       height: diagramBoundary.Size.Height,
       lines,
-      nodes: contexts,
+      nodes,
       boundaries,
       hidden: false,
     });
@@ -674,16 +716,20 @@ export default class OrgChart<T> extends React.Component<
       containerStyle,
       renderNode,
       renderNodeContainer,
+      renderNodeLine,
       nodeContainerStyle,
     } = this.props;
 
-    const lineClassNames: Record<Line["direction"], string | undefined> = {
+    const lineClassNames: Record<
+      LineRenderContext<T>["direction"],
+      string | undefined
+    > = {
       vertical: lineVerticalClassName,
       horizontal: lineHorizontalClassName,
     };
 
     const lineStyles: Record<
-      Line["direction"],
+      LineRenderContext<T>["direction"],
       React.CSSProperties | undefined
     > = {
       vertical: lineVerticalStyle,
@@ -700,107 +746,113 @@ export default class OrgChart<T> extends React.Component<
         }}
         ref={this._container}
       >
-        {lines.map(
-          ({
-            rect: { width, height, left, top },
-            assistant,
-            direction,
-            key,
-          }) => (
-            <div
-              key={key}
-              data-line-assistant={assistant}
-              data-line-direction={direction}
-              className={lineClassNames[direction]}
-              style={{
-                left: 0,
-                top: 0,
-                width,
-                height,
-                transform: `translate3d(${left}px, ${top}px, 0)`,
-                position: "absolute",
-                visibility: hidden ? "hidden" : "visible",
-                pointerEvents: "none",
-                ...lineStyles[direction],
-              }}
-            />
-          )
-        )}
-        {nodes.map((context) => {
-          const {
-            rect: { top, left, width, height },
-            dataId: key,
-            boxId: dataBoxId,
-            data,
-          } = context;
-          const children = renderNode(data);
-          const style: React.CSSProperties = {
-            left: 0,
-            top: 0,
-            transform: `translate3d(${left}px, ${top}px, 0)`,
-            position: "absolute",
-            ...nodeContainerStyle,
-          };
-
-          if (typeof renderNodeContainer === "function") {
-            const props = {
-              children,
-              style,
-              key,
-              "data-box-id": String(dataBoxId),
-            };
-
-            return renderNodeContainer(data, props, { hidden });
-          }
-
-          return (
-            <div
-              key={key}
-              style={{
-                ...style,
-                visibility: hidden ? "hidden" : "visible",
-                pointerEvents: hidden ? "none" : "auto",
-              }}
-              data-box-id={dataBoxId}
-            >
-              {children}
-            </div>
-          );
-        })}
-        {boundaries.map(
-          ({ top, left, width, height, branchLeft, branchTop }, i) => {
-            return (
-              <div
-                key={i}
-                style={{
-                  transform: `translate3d(${left}px, ${top}px, 0)`,
+        <div>
+          {lines.map(
+            ({
+              rect: { width, height, left, top },
+              data,
+              assistant,
+              direction,
+              dataId,
+              index,
+            }) => {
+              const props: NodeLineRenderProps<T> = {
+                "data-line-assistant": assistant,
+                "data-line-direction": direction,
+                className: lineClassNames[direction],
+                key: dataId + "-" + index,
+                style: {
+                  left: 0,
+                  top: 0,
                   width,
                   height,
+                  transform: `translate3d(${left}px, ${top}px, 0)`,
                   position: "absolute",
-                  top: 0,
-                  left: 0,
-                  zIndex: 0,
-                  pointerEvents: "none",
-                  visibility: hidden ? "hidden" : "visible",
-                  background: "rgba(255,0,0,0.1)",
-                  border: "1px solid red",
-                }}
-              >
+                  ...lineStyles[direction],
+                },
+              };
+
+              if (typeof renderNodeLine === "function") {
+                return renderNodeLine(data, props, { hidden });
+              }
+
+              // props.style = { ...props.style };
+              // props.style.visibility = hidden ? "hidden" : "visible";
+              // props.style.pointerEvents = hidden ? "none" : "auto";
+
+              return <div {...props} />;
+            }
+          )}
+        </div>
+        <div>
+          {nodes.map((context) => {
+            const {
+              rect: { top, left, width, height },
+              dataId: key,
+              boxId: dataBoxId,
+              data,
+            } = context;
+            const children = renderNode(data);
+            const props: NodeContainerRenderProps<T> = {
+              "data-box-id": String(dataBoxId),
+              children,
+              key,
+              style: {
+                left: 0,
+                top: 0,
+                transform: `translate3d(${left}px, ${top}px, 0)`,
+                position: "absolute",
+                ...nodeContainerStyle,
+              },
+            };
+
+            if (typeof renderNodeContainer === "function") {
+              return renderNodeContainer(data, props, { hidden });
+            }
+
+            // props.style = { ...props.style };
+            props.style.visibility = hidden ? "hidden" : "visible";
+            props.style.pointerEvents = hidden ? "none" : "auto";
+
+            return <div {...props} />;
+          })}
+        </div>
+        <div>
+          {boundaries.map(
+            ({ top, left, width, height, branchLeft, branchTop }, i) => {
+              return (
                 <div
+                  key={i}
                   style={{
-                    backgroundColor: "red",
-                    color: "white",
-                    display: "inline-block",
-                    padding: "0 2px",
+                    transform: `translate3d(${left}px, ${top}px, 0)`,
+                    width,
+                    height,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    zIndex: 0,
+                    pointerEvents: "none",
+                    visibility: hidden ? "hidden" : "visible",
+                    background: "rgba(255,0,0,0.1)",
+                    border: "1px solid red",
                   }}
                 >
-                  ({+branchLeft.toFixed(2)},{+branchTop.toFixed(2)}){" "}
-                  {+width.toFixed(2)}x{+height.toFixed(2)}
+                  <div
+                    style={{
+                      backgroundColor: "red",
+                      color: "white",
+                      display: "inline-block",
+                      padding: "0 2px",
+                    }}
+                  >
+                    ({+branchLeft.toFixed(2)},{+branchTop.toFixed(2)}){" "}
+                    {+width.toFixed(2)}x{+height.toFixed(2)}
+                  </div>
                 </div>
-              </div>
-            );
-          }
-        )}
+              );
+            }
+          )}
+        </div>
       </div>
     );
   }
