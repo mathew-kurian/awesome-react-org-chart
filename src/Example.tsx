@@ -8,10 +8,10 @@ import OrgChart, {
 } from "../lib/OrgChart";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Grid from "react-fast-grid";
-import generateNodes, { Node, isNode } from "./generate-nodes";
-import Header from "./Header";
+import generateNodes, { Node, isNode } from "./misc/generate-nodes";
+import Header from "./misc/Header";
 import AnimatedNodeContainer from "../lib/AnimatedNodeContainer";
-import CollapsedCards from "./CollapsedCards";
+import CollapsedCards from "./misc/CollapsedCards";
 
 interface ExampleState {
   layout: LayoutType;

@@ -26,7 +26,7 @@
     "start": "node register.js",
     "build": "export NODE_ENV=production; npx npm-run-all --parallel build-app build-lib",
     "watch": "export NODE_ENV=development; npx npm-run-all --parallel watch-app watch-lib",
-    "build-app": "export NODE_ENV=production; npx tsc",
+    "build-app": "export NODE_ENV=production; rm -r ./public/scripts; npx webpack --config webpack.config.js",
     "build-lib": "export NODE_ENV=production; npx tsc",
     "watch-app": "export NODE_ENV=development; npx webpack --config webpack.config.js",
     "watch-lib": "export NODE_ENV=development; npx tsc-watch"
@@ -52,6 +52,7 @@
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.7",
     "@types/faker": "^4.1.12",
+    "@types/jquery": "^3.5.1",
     "@types/node": "^14.0.23",
     "@types/react": "^16.9.43",
     "@types/react-dom": "^16.9.8",

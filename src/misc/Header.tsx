@@ -1,5 +1,5 @@
 import React from "react";
-import { LayoutType } from "../lib/OrgChart";
+import { LayoutType } from "../../lib/OrgChart";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Dropdown from "react-bootstrap/Dropdown";
 import Button from "react-bootstrap/Button";

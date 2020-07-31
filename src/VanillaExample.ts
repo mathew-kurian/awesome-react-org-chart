@@ -18,11 +18,9 @@ import LayoutAlgorithm from "../lib/core/LayoutAlgorithm";
 import MultiLineHangerLayoutStrategy from "../lib/core/MultiLineHangerLayoutStrategy";
 import FishboneAssistantsLayoutStrategy from "../lib/core/FishboneAssistantsLayoutStrategy";
 
-declare const $;
-
 class ChartApp {
-  diagram: Diagram | null;
-  dataSource: TestDataSource | null;
+  diagram: Diagram | null = null;
+  dataSource: TestDataSource | null = null;
   suppressRootBox = false;
   totalBoxCount = 20;
   percentAssistants = 10;
@@ -47,7 +45,7 @@ class ChartApp {
     this.positionBoxes();
   }
 
-  collapseAllBoxes(boxContainer: BoxContainer, isCollapsed) {
+  collapseAllBoxes(boxContainer: BoxContainer, isCollapsed: boolean) {
     for (const box of boxContainer.BoxesByDataId.values()) {
       if (!box.IsSpecial) {
         box.IsCollapsed = isCollapsed;
@@ -221,12 +219,12 @@ class ChartApp {
     let boxContainer = this.diagram?.Boxes;
     let dataSource = this.dataSource;
 
-    if (!boxContainer) {
-      return;
+    if (boxContainer == null) {
+      throw Error("BoxContainer is null");
     }
 
-    if (!dataSource) {
-      return;
+    if (dataSource == null) {
+      throw Error("DataSource is null");
     }
 
     const elements: Element[] = [];
@@ -252,6 +250,10 @@ class ChartApp {
           return true;
         } else if (node.State.IsHidden) {
           return true;
+        }
+
+        if (boxContainer == null) {
+          throw Error("BoxContainer is null");
         }
 
         const level = this.getBoxLevel(boxContainer, box);
@@ -387,11 +389,22 @@ class ChartApp {
     return "hanger4";
   }
 
-  boxSizeFunc(dataId: string) {
+  boxSizeFunc(dataId: string): Size {
     // ChartLayoutAlgorithm requires this function to accept data ID
     // so have to convert it to Box ID first, to get rendered visual element
-    let boxId = this.diagram.Boxes.BoxesByDataId.get(dataId).Id;
-    return this.diagram.Boxes.BoxesById.get(boxId).Size;
+    const boxId = this.diagram?.Boxes.BoxesByDataId.get(dataId)?.Id;
+
+    if (boxId == null) {
+      throw Error("BoxId is null");
+    }
+
+    const size = this.diagram?.Boxes.BoxesById.get(boxId)?.Size;
+
+    if (size == null) {
+      throw Error("Size is null");
+    }
+
+    return size;
   }
 
   getBoxElementSize(boxId: number) {
@@ -401,27 +414,39 @@ class ChartApp {
   positionBoxes() {
     $("#myConnectors").html("");
 
-    let boxContainer = this.diagram.Boxes;
-    let dataSource = this.dataSource;
     let diagram = this.diagram;
+
+    if (diagram == null) {
+      throw Error("Diagram is null");
+    }
 
     let state = new LayoutState(diagram);
 
     state.OperationChanged = this.onLayoutStateChanged;
-    state.BoxSizeFunc = (dataId: string) => this.boxSizeFunc(dataId);
+    state.BoxSizeFunc = (dataId: string | null) => {
+      if (dataId == null) {
+        throw Error("DataId is null");
+      }
+
+      return this.boxSizeFunc(dataId);
+    };
 
     state.LayoutOptimizerFunc = (node: Node) =>
       this.getBranchOptimizerName(node);
 
-    console.log("positionBoxes");
-
     LayoutAlgorithm.Apply(state);
+
+    if (diagram.VisualTree == null) {
+      throw Error("diagram.VisualTree is null");
+    }
 
     const diagramBoundary = LayoutAlgorithm.ComputeBranchVisualBoundingRect(
       diagram.VisualTree
     );
 
-    const myDiagramDiv: HTMLElement = document.querySelector("#myDiagramDiv");
+    const myDiagramDiv: HTMLElement | null = document.querySelector(
+      "#myDiagramDiv"
+    );
 
     if (myDiagramDiv == null) {
       throw Error("Cannot find #myDiagramDiv");
@@ -532,7 +557,14 @@ class ChartApp {
 
     diagram.VisualTree.IterateParentFirst(visitorFunc);
 
-    const myConnectors = document.querySelector("#myConnectors");
+    const myConnectors: HTMLElement | null = document.querySelector(
+      "#myConnectors"
+    );
+
+    if (myConnectors == null) {
+      throw Error("myConnectors is null");
+    }
+
     for (const connector of connectors) {
       myConnectors.appendChild(connector);
     }
@@ -557,12 +589,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // @ts-ignore
   window.clickCollapseAll = function clickCollapseAll(bt) {
+    if (chartApp.diagram == null) {
+      throw Error("chartApp.diagram is null");
+    }
+
     chartApp.collapseAllBoxes(chartApp.diagram.Boxes, true);
     chartApp.buildChart(false);
   };
 
   // @ts-ignore
   window.clickExpandAll = function clickExpandAll(bt) {
+    if (chartApp.diagram == null) {
+      throw Error("chartApp.diagram is null");
+    }
+
     chartApp.collapseAllBoxes(chartApp.diagram.Boxes, false);
     chartApp.buildChart(false);
   };

@@ -1,5 +1,5 @@
-import TestDataSource from "../lib/test/TestDataSource";
-import TestDataGen from "../lib/test/TestDataGen";
+import TestDataSource from "../../lib/test/TestDataSource";
+import TestDataGen from "../../lib/test/TestDataGen";
 import faker from "faker";
 
 export interface Node {

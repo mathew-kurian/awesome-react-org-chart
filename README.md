@@ -46,6 +46,10 @@ The OrgChart uses `transform3d` to position items on the screen. CSS transitions
 
 ![](./animation.gif)
 
+## No React? [Example!](https://mathew-kurian.github.io/awesome-react-org-chart/public/vanilla.html)
+
+The OrgChart does not need to use React. Please refer to the `VanillaExample.ts` file in the repo to learn more.
+
 ## Credits
 
 [OrgChart](https://github.com/romanpolunin/OrgChart) by [@romanpolunin](https://github.com/romanpolunin)
