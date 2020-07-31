@@ -1,4 +1,4 @@
-import React, { RefObject } from "react";
+import React from "react";
 import Diagram from "./core/Diagram";
 import BoxContainer from "./core/BoxContainer";
 import LinearLayoutStrategy from "./core/LinearLayoutStrategy";
@@ -525,6 +525,11 @@ export default class OrgChart<T> extends React.Component<
   }
 
   componentDidUpdate() {
+    if (this.props !== this.state.prevProps) {
+      // this.setState({});
+      return;
+    }
+
     this.safelyDrawDiagram();
   }
 
