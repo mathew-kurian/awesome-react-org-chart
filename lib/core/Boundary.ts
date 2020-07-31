@@ -6,8 +6,8 @@ import Point from "./Point";
 import LayoutAlgorithm from "./LayoutAlgorithm";
 
 export default class Boundary {
-  public Left: Step[];
-  public Right: Step[];
+  private Left: Step[];
+  private Right: Step[];
 
   private _spacerMerger: Boundary | null = null;
   private _boundingRect: Rect | null = null;
@@ -43,7 +43,7 @@ export default class Boundary {
       return;
     }
 
-    var rect = node.State;
+    let rect = node.State;
 
     this.Left.push(new Step(node, rect.Left, rect.Top, rect.Bottom));
     this.Right.push(new Step(node, rect.Right, rect.Top, rect.Bottom));
@@ -53,8 +53,8 @@ export default class Boundary {
   /// Resets the edges, use when re-using this object from pool.
   /// </summary>
   public Prepare(node: Node): void {
-    this.Left.length = 0;
-    this.Right.length = 0;
+    this.Left = [];
+    this.Right = [];
 
     // adjust the top edge to fit the logical grid
     this.BoundingRect = Rect.from(node.State.Size, node.State.TopLeft);
@@ -84,6 +84,7 @@ export default class Boundary {
       let theirSteps = merge == "r" ? other.Right : other.Left;
       let i = 0;
       let k = 0;
+
       for (; k < theirSteps.length && i < mySteps.length; ) {
         let my = mySteps[i];
         let th = theirSteps[k];
@@ -96,14 +97,14 @@ export default class Boundary {
 
         if (th.Bottom <= my.Top) {
           // haven't reached the top of my boundary yet
-          mySteps[i] = th;
+          mySteps.splice(i, 0, th);
           k++;
 
           this.ValidateState();
           continue;
         }
 
-        var theirWins = merge == "r" ? my.X <= th.X : my.X >= th.X;
+        let theirWins = merge == "r" ? my.X <= th.X : my.X >= th.X;
 
         if (LayoutAlgorithm.IsEqual(my.Top, th.Top)) {
           if (LayoutAlgorithm.IsEqual(my.Bottom, th.Bottom)) {
@@ -250,7 +251,7 @@ export default class Boundary {
   }
 
   private ValidateState() {
-    for (var i = 1; i < this.Left.length; i++) {
+    for (let i = 1; i < this.Left.length; i++) {
       if (
         this.Left[i].Top == this.Left[i].Bottom ||
         this.Left[i].Top < this.Left[i - 1].Bottom ||
@@ -262,7 +263,7 @@ export default class Boundary {
       }
     }
 
-    for (var i = 1; i < this.Right.length; i++) {
+    for (let i = 1; i < this.Right.length; i++) {
       if (
         this.Right[i].Top == this.Right[i].Bottom ||
         this.Right[i].Top < this.Right[i - 1].Bottom ||
@@ -321,14 +322,15 @@ export default class Boundary {
           !my.Node.Element.DisableCollisionDetection &&
           !th.Node.Element.DisableCollisionDetection
         ) {
-          var desiredSpacing =
+          const desiredSpacing =
             my.Node.Element.IsSpecial || th.Node.Element.IsSpecial
               ? 0 // when dealing with spacers, no need for additional cushion around them
               : my.Node.Element.ParentId == th.Node.Element.ParentId
               ? siblingSpacing // two siblings kicking each other
               : branchSpacing; // these are two different branches
 
-          var diff = my.X + desiredSpacing - th.X;
+          const diff = my.X + desiredSpacing - th.X;
+
           if (diff > offense) {
             offense = diff;
           }
@@ -347,18 +349,18 @@ export default class Boundary {
   }
 
   public ReloadFromBranch(branchRoot: Node) {
-    var leftmost = Number.MAX_VALUE;
-    var rightmost = Number.MIN_VALUE;
-    for (var i = 0; i < this.Left.length; i++) {
-      var left = this.Left[i];
-      var newLeft = left.Node.State.Left;
+    let leftmost = Number.MAX_VALUE;
+    let rightmost = Number.MIN_VALUE;
+    for (let i = 0; i < this.Left.length; i++) {
+      let left = this.Left[i];
+      let newLeft = left.Node.State.Left;
       this.Left[i] = left.ChangeX(newLeft);
       leftmost = Math.min(leftmost, newLeft);
     }
 
-    for (var i = 0; i < this.Right.length; i++) {
-      var right = this.Right[i];
-      var newRight = right.Node.State.Right;
+    for (let i = 0; i < this.Right.length; i++) {
+      let right = this.Right[i];
+      let newRight = right.Node.State.Right;
       this.Right[i] = right.ChangeX(newRight);
       rightmost = Math.max(rightmost, newRight);
     }

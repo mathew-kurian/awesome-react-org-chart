@@ -128,6 +128,7 @@ export default class LinearLayoutStrategy extends LayoutStrategyBase {
       let leftmost = node.Children[0].State.CenterH;
       let rightmost =
         node.Children[node.State.NumberOfSiblings - 1].State.CenterH;
+
       let desiredCenter =
         node.State.NumberOfSiblings == 1 ||
         this.ParentAlignment == BranchParentAlignment.Center

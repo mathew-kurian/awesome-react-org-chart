@@ -66,13 +66,17 @@ export default class LayoutState {
 
     const boundary = this._pooledBoundaries.pop();
 
+    if (boundary == null) {
+      throw Error("Boundary is null");
+    }
+
     switch (this.CurrentOperation) {
       case Operation.VerticalLayout:
-        boundary?.Prepare(node);
+        boundary.Prepare(node);
         break;
 
       case Operation.HorizontalLayout:
-        boundary?.PrepareForHorizontalLayout(node);
+        boundary.PrepareForHorizontalLayout(node);
         break;
       default:
         throw new Error(
@@ -180,6 +184,7 @@ export default class LayoutState {
                 }
               }
             }
+
             higherLevel.Boundary.MergeFrom(innerLevel.Boundary);
 
             // Do not update branch vertical measurements from the boundary, because boundary adds children one-by-one.
@@ -187,9 +192,9 @@ export default class LayoutState {
             // and this temporarily incorrect state will break those algorithms that need to know combined branch height.
             higherLevel.BranchRoot.State.BranchExterior = new Rect(
               higherLevel.Boundary.BoundingRect.Left,
-              higherLevel.BranchRoot.State.BranchExterior?.Top,
+              higherLevel.BranchRoot.State.BranchExterior.Top,
               higherLevel.Boundary.BoundingRect.Size.Width,
-              higherLevel.BranchRoot.State.BranchExterior?.Size.Height
+              higherLevel.BranchRoot.State.BranchExterior.Size.Height
             );
           }
           break;

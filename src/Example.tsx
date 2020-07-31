@@ -5,93 +5,19 @@ import OrgChart, {
   LayoutType,
   NodeContainerRenderContext,
   NodeContainerRenderProps,
-} from "../dist/OrgChart";
+} from "../lib/OrgChart";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Grid from "react-fast-grid";
 import generateNodes, { Node, isNode } from "./generate-nodes";
 import Header from "./Header";
-import AnimatedNodeContainer from "./AnimatedNodeContainer";
-import { FadeTransform } from "react-animation-components";
+import AnimatedNodeContainer from "../lib/AnimatedNodeContainer";
+import CollapsedCards from "./CollapsedCards";
 
 interface ExampleState {
   layout: LayoutType;
   nodes: Node[];
   collapsed: WeakMap<Node, boolean>;
 }
-
-const CollapsedCards = () => (
-  <>
-    <FadeTransform
-      style={{
-        top: 0,
-        height: "100%",
-        left: "-0.5%",
-        width: "101%",
-        position: "absolute",
-      }}
-      enterTransform="translateY(9%)"
-      in
-    >
-      <Card
-        style={{
-          height: "100%",
-          width: "100%",
-          borderRadius: 8,
-          border: "none",
-          boxShadow: "0 3px 3px rgba(0,0,0,0.2)",
-          background: "#6a3fff",
-          color: "rgba(255,255,255,0.75)",
-        }}
-      />
-    </FadeTransform>
-    <FadeTransform
-      style={{
-        top: 0,
-        height: "100%",
-        left: "-0.5%",
-        width: "101%",
-        position: "absolute",
-      }}
-      enterTransform="translateY(6%)"
-      in
-    >
-      <Card
-        style={{
-          height: "100%",
-          width: "100%",
-          borderRadius: 8,
-          border: "none",
-          boxShadow: "0 3px 3px rgba(0,0,0,0.2)",
-          background: "#fe3efa",
-          color: "rgba(255,255,255,0.75)",
-        }}
-      />
-    </FadeTransform>
-    <FadeTransform
-      style={{
-        top: 0,
-        height: "100%",
-        left: "-0.5%",
-        width: "101%",
-        position: "absolute",
-      }}
-      enterTransform="translateY(3%)"
-      in
-    >
-      <Card
-        style={{
-          height: "100%",
-          width: "100%",
-          borderRadius: 8,
-          border: "none",
-          boxShadow: "0 3px 3px rgba(0,0,0,0.2)",
-          background: "#fea83e",
-          color: "rgba(255,255,255,0.75)",
-        }}
-      />
-    </FadeTransform>
-  </>
-);
 
 export default class Example extends Component<{}, ExampleState> {
   state = {
@@ -136,6 +62,8 @@ export default class Example extends Component<{}, ExampleState> {
       node={node}
       props={props}
       context={context}
+      defaultTransition="transform 800ms"
+      entranceTransition="opacity 800ms"
     />
   );
 

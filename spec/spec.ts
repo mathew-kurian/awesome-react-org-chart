@@ -21,8 +21,8 @@ import FishboneAssistantsLayoutStrategy from "../lib/core/FishboneAssistantsLayo
 declare const $;
 
 class ChartApp {
-  diagram: Diagram;
-  dataSource: TestDataSource;
+  diagram: Diagram | null;
+  dataSource: TestDataSource | null;
   suppressRootBox = false;
   totalBoxCount = 20;
   percentAssistants = 10;
@@ -32,9 +32,12 @@ class ChartApp {
   }
 
   boxClick(boxId: number) {
-    const box = this.diagram.Boxes.BoxesById.get(boxId);
-    box.IsCollapsed = !box.IsCollapsed;
-    this.positionBoxes();
+    const box = this.diagram?.Boxes.BoxesById.get(boxId);
+
+    if (box) {
+      box.IsCollapsed = !box.IsCollapsed;
+      this.positionBoxes();
+    }
   }
 
   buildChart(initData: boolean) {
@@ -215,8 +218,16 @@ class ChartApp {
   };
 
   renderBoxes() {
-    let boxContainer = this.diagram.Boxes;
+    let boxContainer = this.diagram?.Boxes;
     let dataSource = this.dataSource;
+
+    if (!boxContainer) {
+      return;
+    }
+
+    if (!dataSource) {
+      return;
+    }
 
     const elements: Element[] = [];
     const expanders: Element[] = [];
@@ -243,22 +254,14 @@ class ChartApp {
           return true;
         }
 
-        let level = this.getBoxLevel(boxContainer, box);
-        let dataItem = dataSource.GetDataItem(box.DataId);
+        const level = this.getBoxLevel(boxContainer, box);
 
-        const className =
-          {
-            1: "chartBoxTop",
-            2: "chartBoxMiddle",
-            3: "chartBoxLower",
-          }[level] || "chartBoxLowest";
+        const className: string =
+          [null, "chartBoxTop", "chartBoxMiddle", "chartBoxLower"][level] ||
+          "chartBoxLowest";
 
-        const position =
-          {
-            1: "Top",
-            2: "Middle",
-            3: "Lower",
-          }[level] || level;
+        const position: string =
+          [null, "Top", "Middle", "Lower"][level] || String(level);
 
         const element = document.createElement("div");
         element.className = className;
@@ -287,15 +290,17 @@ class ChartApp {
       return true;
     };
 
-    this.diagram.VisualTree.IterateParentFirst(visitorFunc);
+    this.diagram?.VisualTree?.IterateParentFirst(visitorFunc);
 
     const myDiagramDiv = document.querySelector("#myDiagramDiv");
 
-    for (const expander of expanders) {
-      myDiagramDiv.appendChild(expander);
-    }
-    for (const element of elements) {
-      myDiagramDiv.appendChild(element);
+    if (myDiagramDiv) {
+      for (const expander of expanders) {
+        myDiagramDiv.appendChild(expander);
+      }
+      for (const element of elements) {
+        myDiagramDiv.appendChild(element);
+      }
     }
   }
 
@@ -305,6 +310,7 @@ class ChartApp {
     );
 
     const func =
+      // @ts-ignore
       this["branchOptimizer" + selector?.value] ||
       this.branchOptimizerAllLinear;
 

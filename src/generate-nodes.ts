@@ -1,5 +1,5 @@
-import TestDataSource from "../dist/test/TestDataSource";
-import TestDataGen from "../dist/test/TestDataGen";
+import TestDataSource from "../lib/test/TestDataSource";
+import TestDataGen from "../lib/test/TestDataGen";
 import faker from "faker";
 
 export interface Node {
@@ -13,6 +13,39 @@ export interface Node {
 export function isNode(obj: any): obj is Node {
   return obj != null && Array.isArray((obj as Node).children);
 }
+const linearLayout: Node[] = [
+  { id: "0", children: ["1", "2"], name: "0", description: "", color: "black" },
+  {
+    id: "1",
+    children: ["3", "4", "5"],
+    name: "1",
+    description: "",
+    color: "black",
+  },
+  {
+    id: "2",
+    children: ["6", "7", "8"],
+    name: "2",
+    description: "",
+    color: "black",
+  },
+  {
+    id: "3",
+    children: [],
+    name: "3",
+    description: "",
+    color: "black",
+  },
+  { id: "4", children: [], name: "4", description: "", color: "black" },
+  { id: "5", children: [], name: "5", description: "", color: "black" },
+  { id: "6", children: [], name: "6", description: "", color: "black" },
+  { id: "7", children: [], name: "7", description: "", color: "black" },
+  { id: "8", children: [], name: "8", description: "", color: "black" },
+  { id: "9", children: [], name: "9", description: "", color: "black" },
+  { id: "10", children: [], name: "10", description: "", color: "black" },
+];
+
+export { linearLayout };
 
 export default (count: number) => {
   const percentAssistants = 0;
@@ -43,7 +76,7 @@ export default (count: number) => {
     });
   }
 
-  let parentNode;
+  let parentNode: Node | null | undefined;
   let childrenSet = new Set<string>();
 
   for (const item of dataSource.Items.values()) {
@@ -62,6 +95,10 @@ export default (count: number) => {
     } else {
       parentNode = nodeMap.get(id);
     }
+  }
+
+  if (!parentNode) {
+    throw Error("Could not find parent node");
   }
 
   const nodes = [...nodeMap.values()].filter((node) => node !== parentNode);

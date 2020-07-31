@@ -23,5 +23,5 @@
     "downlevelIteration": true
   },
   "exclude": ["node_modules"],
-  "include": ["lib/**/*"]
+  "include": ["lib/**/*", "src/**/*"]
 }

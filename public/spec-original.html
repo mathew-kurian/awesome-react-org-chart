@@ -5,9 +5,9 @@
     <title>Demo for RomanPolunin.OrgChart.Net library on NuGet</title>
     <meta charset="utf-8" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="./scripts/bridge.min.js"></script>
-    <script src="./scripts/bridge.collections.min.js"></script>
-    <script src="./scripts/OrgChart.Layout.js"></script>
+    <script src="./scripts-spec-original/bridge.min.js"></script>
+    <script src="./scripts-spec-original/bridge.collections.min.js"></script>
+    <script src="./scripts-spec-original/OrgChart.Layout.js"></script>
   </head>
   <body>
     <style>
@@ -119,7 +119,7 @@
         >Suppress root data item, to have multiple roots in the diagram</label
       >
       <br />
-      <input type="checkbox" id="CollapseAllOnRebuild" checked />
+      <input type="checkbox" id="CollapseAllOnRebuild" />
       <label for="CollapseAllOnRebuild"
         >Collapse all boxes on data change</label
       >
@@ -129,6 +129,7 @@
         name="DataCounts"
         id="DataCounts"
         value="small"
+        checked
         onclick="clickDataCounts(this)"
       />Small
       <input
@@ -136,7 +137,6 @@
         name="DataCounts"
         id="DataCounts"
         value="small-a"
-        checked
         onclick="clickDataCounts(this)"
       />Small with asst
       <input
@@ -178,6 +178,7 @@
         name="SelectBranchOptimizer"
         id="SelectBranchOptimizer"
         value="AllLinear"
+        checked
         onclick="clickOptimizer(this)"
       />Linear
       <input
@@ -193,7 +194,6 @@
         id="SelectBranchOptimizer"
         value="AllHanger4"
         onclick="clickOptimizer(this)"
-        checked
       />Hanger4
       <input
         type="radio"
@@ -265,8 +265,8 @@
           diagram: {},
           dataSource: {},
           suppressRootBox: false,
-          totalBoxCount: 20,
-          percentAssistants: 10,
+          totalBoxCount: 9,
+          percentAssistants: 0,
 
           boxClick: function (boxId) {
             var box = ChartApp.diagram.getBoxes().getBoxesById().getItem(boxId);
@@ -289,6 +289,34 @@
                 box.IsCollapsed = isCollapsed;
               }
             }
+          },
+
+          createDataItem: function (id, parentId, data) {
+            const dataItem = new OrgChart.Test.TestDataItem();
+
+            dataItem.Id = id;
+            dataItem.Data = data;
+            dataItem.ParentId = parentId;
+
+            return dataItem;
+          },
+
+          getDataSource: function (dataItems) {
+            var dataSource = new OrgChart.Test.TestDataSource();
+
+            new OrgChart.Test.TestDataGen().GenerateDataItems(dataSource, 2, 0);
+
+            dataSource.Items.clear();
+
+            for (const dataItem of dataItems) {
+              try {
+                dataSource.Items.add(dataItem.getId(), dataItem);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+
+            return dataSource;
           },
 
           generateData: function () {
@@ -316,6 +344,23 @@
             return dataSource;
           },
 
+          computeItems: function (root, keyGetter, childNodesGetter) {
+            const dataItems = [];
+
+            const processNode = (node, parentKey) => {
+              const key = keyGetter(node);
+              dataItems.push(ChartApp.createDataItem(key, parentKey, node));
+
+              for (const childNode of childNodesGetter(node)) {
+                processNode(childNode, key);
+              }
+            };
+
+            processNode(root, null);
+
+            return dataItems;
+          },
+
           initDiagram: function () {
             $("#myDiagramDiv").html("");
             $("#myDiagramDiv").append(
@@ -323,6 +368,97 @@
             );
 
             var dataSource = ChartApp.generateData();
+
+            var items = [
+              {
+                id: "0",
+                children: ["1", "2"],
+                name: "0",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "1",
+                children: ["3", "4", "5"],
+                name: "1",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "2",
+                children: ["6", "7", "8"],
+                name: "2",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "3",
+                children: [],
+                name: "3",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "4",
+                children: [],
+                name: "4",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "5",
+                children: [],
+                name: "5",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "6",
+                children: [],
+                name: "6",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "7",
+                children: [],
+                name: "7",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "8",
+                children: [],
+                name: "8",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "9",
+                children: [],
+                name: "9",
+                description: "",
+                color: "black",
+              },
+              {
+                id: "10",
+                children: [],
+                name: "10",
+                description: "",
+                color: "black",
+              },
+            ];
+
+            dataSource = ChartApp.getDataSource(
+              ChartApp.computeItems(
+                items[0],
+                (node) => String(node.id),
+                (node) =>
+                  node.children.map((id) =>
+                    items.find((node) => node.id === id)
+                  )
+              )
+            );
 
             ChartApp.dataSource = dataSource;
 
@@ -452,7 +588,7 @@
               assistantsLayoutStrategy
             );
 
-            diagram.LayoutSettings.DefaultLayoutStrategyId = "linear";
+            diagram.LayoutSettings.DefaultLayoutStrategyId = "fishbone1";
             diagram.LayoutSettings.DefaultAssistantLayoutStrategyId = "linear";
             //diagram.LayoutSettings.setBranchSpacing(5);
           },

@@ -19,34 +19,34 @@ import LayoutStrategyBase from "./core/LayoutStrategyBase";
 
 const NOOP_SIZE = new Size(5, 5);
 
-const get3dOffset = (
-  position: number,
-  size: number | string,
-  containerSize: number
-): string => {
-  if (typeof size === "string") {
-    return position + "px";
-  }
-
-  return (position / containerSize) * 100 * (containerSize / size) + "%";
-};
-
 export interface Rect {
+  top: number;
+  left: number;
+  height: number;
+  width: number;
+}
+
+export interface CSSRect {
   top: number;
   left: number;
   height: number | string;
   width: number | string;
 }
 
+export interface BoundaryRect extends Rect {
+  branchTop: number;
+  branchLeft: number;
+}
+
 export interface Line {
-  rect: Rect;
+  rect: CSSRect;
   direction: "vertical" | "horizontal";
   assistant: boolean;
   key: string;
 }
 
 export interface NodeRenderContext<T> {
-  rect: Rect;
+  rect: CSSRect;
   data: T;
   dataId: string;
   boxId: number;
@@ -80,15 +80,6 @@ class OrgChartDiagram<T> extends Diagram {
   }
 }
 
-interface OrgChartState<T> {
-  lines: Line[];
-  width: number;
-  height: number;
-  diagram: OrgChartDiagram<T> | null;
-  nodes: NodeRenderContext<T>[];
-  hidden: boolean;
-}
-
 export type NodeContainerRenderProps<T> = {
   "data-box-id": string;
   key: string;
@@ -100,7 +91,6 @@ interface OrgChartProps<T> {
   root: T;
   keyGetter: (node: T) => string;
   childNodesGetter: (node: T) => T[];
-  collapsedGetter?: (node: T) => boolean;
   lineVerticalClassName?: string;
   lineHorizontalClassName?: string;
   lineVerticalStyle?: React.CSSProperties;
@@ -116,6 +106,19 @@ interface OrgChartProps<T> {
   ) => React.ReactElement;
   parentSpacing?: number;
   siblingSpacing?: number;
+  debug?: boolean;
+}
+
+interface OrgChartState<T> {
+  lines: Line[];
+  width: number;
+  height: number;
+  diagram: OrgChartDiagram<T> | null;
+  nodes: NodeRenderContext<T>[];
+  hidden: boolean;
+  boundaries: BoundaryRect[];
+  prevProps: OrgChartProps<T> | null;
+  renderIndex: number;
 }
 
 export default class OrgChart<T> extends React.Component<
@@ -129,9 +132,12 @@ export default class OrgChart<T> extends React.Component<
     diagram: null,
     nodes: [],
     hidden: true,
+    boundaries: [],
+    prevProps: null,
+    renderIndex: 0,
   };
 
-  _container: React.RefObject<HTMLDivElement> = React.createRef();
+  private _container: React.RefObject<HTMLDivElement> = React.createRef();
 
   private static assignStrategies(diagram: Diagram): LayoutStrategyBase[] {
     const strategies: LayoutStrategyBase[] = [];
@@ -232,11 +238,13 @@ export default class OrgChart<T> extends React.Component<
     return strategies;
   }
 
-  getDataSource(root: T): IChartDataSource<OrgChartDataItem<T>> {
+  private static getDataSource<T>(
+    root: T,
+    childNodesGetter: (node: T) => T[],
+    keyGetter: (node: T) => string
+  ): IChartDataSource<OrgChartDataItem<T>> {
     const items: Map<string, OrgChartDataItem<T>> = new Map();
     const sortedKeys: string[] = [];
-    const { childNodesGetter, keyGetter } = this.props;
-
     const processNode = (node: T, parentKey: string | null = null) => {
       const key = keyGetter(node);
 
@@ -325,19 +333,60 @@ export default class OrgChart<T> extends React.Component<
     return "hanger4";
   }
 
-  componentDidMount() {
-    this.createDiagram();
+  static getDerivedStateFromProps<T>(
+    props: OrgChartProps<T>,
+    state: OrgChartState<T>
+  ): Partial<OrgChartState<T>> {
+    if (props !== state.prevProps) {
+      const diagram = OrgChart.createDiagram(props);
+      const placeholders = OrgChart.getPlaceholders(diagram, state.nodes);
+
+      return {
+        diagram,
+        ...placeholders,
+        prevProps: props,
+        renderIndex: state.renderIndex + 1,
+      };
+    }
+
+    return { prevProps: props };
   }
 
-  private createDiagram() {
+  componentWillMount() {
+    const nextState = OrgChart.getDerivedStateFromProps(this.props, this.state);
+
+    // @ts-ignore
+    this.setState(nextState);
+  }
+
+  componentWillReceiveProps(nextProps: OrgChartProps<T>) {
+    if (nextProps !== this.props) {
+      const nextState = OrgChart.getDerivedStateFromProps(
+        nextProps,
+        this.state
+      );
+
+      // @ts-ignore
+      this.setState(nextState);
+    }
+  }
+
+  private static createDiagram<T>(props: OrgChartProps<T>) {
     const {
       root,
       layout,
       parentSpacing = 40,
       siblingSpacing = 30,
-    } = this.props;
+      childNodesGetter,
+      keyGetter,
+    } = props;
 
-    const dataSource = this.getDataSource(root);
+    const dataSource = OrgChart.getDataSource(
+      root,
+      childNodesGetter,
+      keyGetter
+    );
+
     const boxContainer = new BoxContainer(dataSource);
     const diagram = new OrgChartDiagram<T>(dataSource);
 
@@ -355,7 +404,7 @@ export default class OrgChart<T> extends React.Component<
       strategy.SiblingSpacing = siblingSpacing;
     }
 
-    this.setState({ diagram }, () => this.drawDiagram(diagram));
+    return diagram;
   }
 
   private onComputeBranchOptimizer = (node: Node): string | null => {
@@ -374,92 +423,119 @@ export default class OrgChart<T> extends React.Component<
     }
   };
 
-  private drawDiagram(
+  private static getPlaceholders<T>(
     diagram: OrgChartDiagram<T>,
-    computeSize: boolean = false
+    prevNodes: NodeRenderContext<T>[]
   ) {
-    if (diagram !== this.state.diagram) {
-      return;
+    const dataSource = diagram.DataSource;
+    const nodes: NodeRenderContext<T>[] = [];
+    const prevNodesByDataId = new Map<string, NodeRenderContext<T>>();
+
+    for (const node of prevNodes) {
+      prevNodesByDataId.set(node.dataId, node);
     }
 
-    if (!computeSize) {
-      const dataSource = diagram.DataSource;
-      const contexts: NodeRenderContext<T>[] = [];
+    const DEFAULT_RECT: CSSRect = {
+      left: 0,
+      top: 0,
+      // unused
+      width: "",
+      height: "",
+    };
 
-      for (const box of diagram.Boxes.BoxesById.values()) {
-        if (!box.IsDataBound) {
-          continue;
-        }
-
-        const id = box.Id;
-        const data = dataSource.GetDataItemFunc(box.DataId || "").data;
-
-        contexts.push({
-          rect: {
-            left: 0,
-            top: 0,
-            width: "auto",
-            height: "auto",
-          },
-          data,
-          dataId: box.DataId || String(id),
-          boxId: id,
-        });
+    for (const box of diagram.Boxes.BoxesById.values()) {
+      if (!box.IsDataBound) {
+        continue;
       }
 
-      this.setState(
-        {
-          hidden: true,
-          nodes: contexts,
-        },
-        () => this.drawDiagram(diagram, true)
-      );
+      const id = box.Id;
+      const dataId = box.DataId || "";
+      const data = dataSource.GetDataItemFunc(dataId).data;
+      const prevNode = prevNodesByDataId.get(dataId);
+      const nextRect = prevNode?.rect || DEFAULT_RECT;
 
+      nodes.push({
+        rect: {
+          left: nextRect.left,
+          top: nextRect.top,
+          width: "auto",
+          height: "auto",
+        },
+        data,
+        dataId: box.DataId || String(id),
+        boxId: id,
+      });
+    }
+
+    return { hidden: true, nodes };
+  }
+
+  private _lastRenderIndex: number = 0;
+  private safelyDrawDiagram() {
+    const { diagram, renderIndex } = this.state;
+    const { debug } = this.props;
+
+    if (renderIndex > this._lastRenderIndex) {
+      this._lastRenderIndex = renderIndex;
+
+      if (diagram) {
+        this.drawDiagram(diagram, debug);
+      }
+    }
+  }
+
+  componentDidMount() {
+    this.safelyDrawDiagram();
+  }
+
+  componentDidUpdate() {
+    this.safelyDrawDiagram();
+  }
+
+  private drawDiagram(diagram: OrgChartDiagram<T>, debug?: boolean) {
+    if (diagram !== this.state.diagram) {
       return;
     }
 
     const state = new LayoutState(diagram);
     const nodeMap: Map<number, HTMLDivElement> = new Map();
+    const container: HTMLDivElement | null = this._container.current;
 
-    if (computeSize) {
-      const container: HTMLDivElement | null = this._container.current;
+    if (container) {
+      container.querySelectorAll("[data-box-id]").forEach((node: Element) => {
+        const id = node.getAttribute("data-box-id");
 
-      if (container) {
-        container.querySelectorAll("[data-box-id]").forEach((node: Element) => {
-          const id = node.getAttribute("data-box-id");
-
-          if (id) {
-            nodeMap.set(parseInt(id), node as HTMLDivElement);
-          }
-        });
-      }
+        if (id) {
+          nodeMap.set(parseInt(id), node as HTMLDivElement);
+        }
+      });
     }
 
     // state.OperationChanged = this.onLayoutStateChanged;
     state.LayoutOptimizerFunc = this.onComputeBranchOptimizer;
-    state.BoxSizeFunc = () => new Size(5, 5);
-
-    if (computeSize) {
-      state.BoxSizeFunc = (dataId: string | null) => {
-        if (dataId == null) {
-          return NOOP_SIZE;
-        }
-
-        const box = diagram.Boxes.BoxesByDataId.get(dataId);
-
-        if (box) {
-          const element = nodeMap.get(box.Id);
-
-          if (element) {
-            const rect = element.getBoundingClientRect();
-
-            return new Size(rect.width, rect.height);
-          }
-        }
-
+    state.BoxSizeFunc = (dataId: string | null) => {
+      if (dataId == null) {
         return NOOP_SIZE;
-      };
-    }
+      }
+
+      const box = diagram.Boxes.BoxesByDataId.get(dataId);
+
+      if (box) {
+        const element = nodeMap.get(box.Id);
+
+        if (element) {
+          // force recalculate
+          void element.offsetWidth;
+          void element.offsetHeight;
+
+          const rect = element.getBoundingClientRect();
+
+          return new Size(rect.width, rect.height);
+        }
+      }
+
+      return NOOP_SIZE;
+    };
 
     LayoutAlgorithm.Apply(state);
 
@@ -476,6 +552,7 @@ export default class OrgChart<T> extends React.Component<
 
     const contexts: NodeRenderContext<T>[] = [];
     const lines: Line[] = [];
+    const boundaries: BoundaryRect[] = [];
 
     diagram.VisualTree.IterateParentFirst((node: Node) => {
       if (node.State.IsHidden) {
@@ -506,6 +583,17 @@ export default class OrgChart<T> extends React.Component<
           dataId: dataId || String(box.Id),
           boxId: box.Id,
         });
+
+        if (debug) {
+          boundaries.push({
+            branchLeft: node.State.BranchExterior.Left,
+            branchTop: node.State.BranchExterior.Top,
+            left: node.State.BranchExterior.Left + offsetX,
+            top: node.State.BranchExterior.Top + offsetY,
+            width: node.State.BranchExterior.Size.Width,
+            height: node.State.BranchExterior.Size.Height,
+          });
+        }
       }
 
       // Render connectors
@@ -563,24 +651,9 @@ export default class OrgChart<T> extends React.Component<
       height: diagramBoundary.Size.Height,
       lines,
       nodes: contexts,
+      boundaries,
       hidden: false,
     });
-  }
-
-  // private tryDrawDiagram(
-  //   diagram: OrgChartDiagram<T> | null = this.state.diagram
-  // ) {
-  //   if (diagram == null) {
-  //     throw Error("Diagram is null");
-  //   }
-
-  //   this.drawDiagram(diagram);
-  // }
-
-  componentDidUpdate(prevProps: OrgChartProps<T>) {
-    if (this.props !== prevProps) {
-      this.createDiagram();
-    }
   }
 
   render() {
@@ -590,7 +663,9 @@ export default class OrgChart<T> extends React.Component<
       height: containerHeight,
       nodes,
       hidden,
+      boundaries,
     } = this.state;
+
     const {
       lineVerticalClassName,
       lineHorizontalClassName,
@@ -662,11 +737,7 @@ export default class OrgChart<T> extends React.Component<
           const style: React.CSSProperties = {
             left: 0,
             top: 0,
-            transform: `translate3d(${get3dOffset(
-              left,
-              width,
-              containerWidth
-            )}, ${get3dOffset(top, height, containerHeight)}, 0)`,
+            transform: `translate3d(${left}px, ${top}px, 0)`,
             position: "absolute",
             ...nodeContainerStyle,
           };
@@ -696,6 +767,40 @@ export default class OrgChart<T> extends React.Component<
             </div>
           );
         })}
+        {boundaries.map(
+          ({ top, left, width, height, branchLeft, branchTop }, i) => {
+            return (
+              <div
+                key={i}
+                style={{
+                  transform: `translate3d(${left}px, ${top}px, 0)`,
+                  width,
+                  height,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  zIndex: 0,
+                  pointerEvents: "none",
+                  visibility: hidden ? "hidden" : "visible",
+                  background: "rgba(255,0,0,0.1)",
+                  border: "1px solid red",
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: "red",
+                    color: "white",
+                    display: "inline-block",
+                    padding: "0 2px",
+                  }}
+                >
+                  ({+branchLeft.toFixed(2)},{+branchTop.toFixed(2)}){" "}
+                  {+width.toFixed(2)}x{+height.toFixed(2)}
+                </div>
+              </div>
+            );
+          }
+        )}
       </div>
     );
   }

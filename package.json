@@ -24,9 +24,11 @@
   ],
   "scripts": {
     "start": "node register.js",
-    "build": "export NODE_ENV=production; npm run build-lib; npx webpack --config webpack.config.js; ",
-    "watch": "export NODE_ENV=development; npx webpack --config webpack.config.js",
+    "build": "export NODE_ENV=production; npx npm-run-all --parallel build-app build-lib",
+    "watch": "export NODE_ENV=development; npx npm-run-all --parallel watch-app watch-lib",
+    "build-app": "export NODE_ENV=production; npx tsc",
     "build-lib": "export NODE_ENV=production; npx tsc",
+    "watch-app": "export NODE_ENV=development; npx webpack --config webpack.config.js",
     "watch-lib": "export NODE_ENV=development; npx tsc-watch"
   },
   "author": "Mathew Kurian",
@@ -60,6 +62,7 @@
     "express": "^4.17.1",
     "faker": "^4.1.0",
     "fork-ts-checker-webpack-plugin": "^5.0.7",
+    "npm-run-all": "^4.1.5",
     "react": "latest",
     "react-animation-components": "^3.0.0",
     "react-bootstrap": "^1.2.2",
