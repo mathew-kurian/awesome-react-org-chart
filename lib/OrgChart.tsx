@@ -508,6 +508,11 @@ export default class OrgChart<T> extends React.Component<
 
   private _lastRenderIndex: number = 0;
   private safelyDrawDiagram() {
+    if (this.props !== this.state.prevProps) {
+      // this.setState({});
+      return;
+    }
+
     const { diagram, renderIndex } = this.state;
     const { debug } = this.props;
 
@@ -525,11 +530,6 @@ export default class OrgChart<T> extends React.Component<
   }
 
   componentDidUpdate() {
-    if (this.props !== this.state.prevProps) {
-      // this.setState({});
-      return;
-    }
-
     this.safelyDrawDiagram();
   }
 
