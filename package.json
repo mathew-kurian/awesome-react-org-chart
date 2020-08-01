@@ -25,12 +25,12 @@
   "scripts": {
     "test": "npx ts-mocha ./spec/**/*.spec.ts",
     "start": "node register.js",
-    "build": "export NODE_ENV=production; npx npm-run-all --parallel build-app build-lib",
+    "build": "export NODE_ENV=production; npm run build-lib; npm run build-app",
     "watch": "export NODE_ENV=development; npx npm-run-all --parallel watch-app watch-lib",
     "build-app": "export NODE_ENV=production; rm -r ./public/scripts; npx webpack --config webpack.config.js",
-    "build-lib": "export NODE_ENV=production; npx tsc --project tsconfig-build.json",
+    "build-lib": "export NODE_ENV=production; rm -r ./dist; npx tsc",
     "watch-app": "export NODE_ENV=development; npx webpack --config webpack.config.js",
-    "watch-lib": "export NODE_ENV=development; npx tsc-watch"
+    "watch-lib": "export NODE_ENV=development; rm -r ./dist; npx tsc-watch"
   },
   "author": "Mathew Kurian",
   "license": "MIT",
