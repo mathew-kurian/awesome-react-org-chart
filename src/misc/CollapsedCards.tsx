@@ -7,13 +7,13 @@ const CollapsedCards = () => (
   <>
     <FadeTransform
       style={{
-        top: 0,
+        top: 6,
+        left: -6,
         height: "100%",
-        left: "-0.5%",
-        width: "101%",
+        width: "100%",
         position: "absolute",
       }}
-      enterTransform="translateY(9%)"
+      enterTransform="transform3d(-9%, 9%, 0)"
       in
     >
       <Card
@@ -30,13 +30,13 @@ const CollapsedCards = () => (
     </FadeTransform>
     <FadeTransform
       style={{
-        top: 0,
+        top: 4,
+        left: -4,
         height: "100%",
-        left: "-0.5%",
-        width: "101%",
+        width: "100%",
         position: "absolute",
       }}
-      enterTransform="translateY(6%)"
+      enterTransform="transform3d(-6%, 6%, 0)"
       in
     >
       <Card
@@ -53,13 +53,13 @@ const CollapsedCards = () => (
     </FadeTransform>
     <FadeTransform
       style={{
-        top: 0,
+        top: 2,
+        left: -2,
         height: "100%",
-        left: "-0.5%",
-        width: "101%",
+        width: "100%",
         position: "absolute",
       }}
-      enterTransform="translateY(3%)"
+      enterTransform="transform3d(-3%, 3%, 0)"
       in
     >
       <Card

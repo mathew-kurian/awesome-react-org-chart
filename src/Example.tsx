@@ -65,8 +65,6 @@ export default class Example extends Component<{}, ExampleState> {
       props={props}
       context={context}
       getStyle={() => null}
-      defaultTransition="opacity 800ms, transform 800ms"
-      entranceTransition="opacity 800ms"
     />
   );
 
@@ -85,8 +83,6 @@ export default class Example extends Component<{}, ExampleState> {
           ? "borderTop"
           : "borderLeft"]: "2px solid rgba(255,255,255,0.15)",
       })}
-      defaultTransition="opacity 1600ms, transform 800ms, 800ms width, 800ms height"
-      entranceTransition="opacity 1600ms"
     />
   );
 

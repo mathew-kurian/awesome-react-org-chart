@@ -5,13 +5,13 @@ import {
   NodeLineRenderProps,
   NodeLineRenderContext,
 } from "./OrgChart";
+import { Transition } from "react-transition-group";
 
 interface AnimatedProps<T> {
   node: T;
   props: NodeContainerRenderProps<T> | NodeLineRenderProps<T>;
   context: NodeContainerRenderContext<T> | NodeLineRenderContext<T>;
-  defaultTransition?: string;
-  entranceTransition?: string;
+  duration?: number;
   getStyle?: (
     node: T,
     props: NodeContainerRenderProps<T> | NodeLineRenderProps<T>,
@@ -20,9 +20,7 @@ interface AnimatedProps<T> {
 }
 
 interface AnimatedState {
-  transition: string;
-  opacity: number;
-  firstVisible: boolean;
+  entered: boolean;
 }
 
 export default class Animated<T> extends React.Component<
@@ -30,43 +28,53 @@ export default class Animated<T> extends React.Component<
   AnimatedState
 > {
   state = {
-    transition: this.props.entranceTransition || "opacity 800ms",
-    opacity: 0,
-    firstVisible: false,
+    entered: false,
   };
 
-  static getDerivedStateFromProps<T>(
-    {
-      context,
-      defaultTransition = "transform 800ms, opacity 800ms",
-      entranceTransition = "opacity 800ms",
-    }: AnimatedProps<T>,
-    state: AnimatedState
-  ): Partial<AnimatedState> {
-    if (context.hidden) {
-      return { opacity: 0 };
-    } else if (!state.firstVisible) {
-      return { opacity: 1, transition: entranceTransition, firstVisible: true };
-    } else {
-      return { opacity: 1, transition: defaultTransition };
-    }
-  }
-
   render() {
-    const { node, context, props, getStyle } = this.props;
-    const { opacity, transition } = this.state;
+    const { node, context, props, getStyle, duration = 500 } = this.props;
+    const { entered } = this.state;
     const style = getStyle ? getStyle(node, props, context) : null;
 
+    const defaultStyle = {
+      transition: entered
+        ? `opacity ${duration}ms, 
+           width ${duration}ms, 
+           height ${duration}ms, 
+           transform ${duration}ms`
+        : `opacity ${duration}ms`,
+      opacity: 0,
+    };
+
+    const transitionStyles: Record<string, React.CSSProperties> = {
+      entering: { opacity: 0 },
+      entered: { opacity: 1 },
+      exiting: { opacity: 0 },
+      exited: { opacity: 0 },
+    };
+
     return (
-      <div
-        {...props}
-        style={{
-          ...props.style,
-          opacity,
-          transition,
-          ...style,
+      <Transition
+        in={entered || !context.hidden}
+        appear={!context.hidden}
+        timeout={duration}
+        exit={false}
+        onEntered={() => this.setState({ entered: true })}
+      >
+        {(state: keyof typeof transitionStyles) => {
+          return (
+            <div
+              {...props}
+              style={{
+                ...props.style,
+                ...defaultStyle,
+                ...transitionStyles[state],
+                ...style,
+              }}
+            />
+          );
         }}
-      />
+      </Transition>
     );
   }
 }
