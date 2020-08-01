@@ -17,10 +17,12 @@ const layouts: LayoutType[] = [
 
 interface HeaderProps {
   isPlaceholder: boolean;
+  debug: boolean;
   nodeCount: number;
   layout: LayoutType;
   onSelectNodeCount: (count: number) => void;
   onSelectLayout: (layout: LayoutType) => void;
+  setDebug: (debug: boolean) => void;
 }
 
 export default React.forwardRef<HTMLDivElement, HeaderProps>(
@@ -31,6 +33,8 @@ export default React.forwardRef<HTMLDivElement, HeaderProps>(
       layout,
       onSelectLayout,
       onSelectNodeCount,
+      setDebug,
+      debug,
     }: HeaderProps,
     ref
   ): React.ReactElement => {
@@ -112,6 +116,9 @@ export default React.forwardRef<HTMLDivElement, HeaderProps>(
                 ))}
               </Dropdown.Menu>
             </Dropdown>
+          </Grid>
+          <Grid item>
+            <Button onClick={() => setDebug(!debug)}>Toggle Debug</Button>
           </Grid>
         </Grid>
         <br />

@@ -19,6 +19,7 @@ interface ExampleState {
   layout: LayoutType;
   nodes: Node[];
   collapsed: WeakMap<Node, boolean>;
+  debug: boolean;
 }
 
 export default class Example extends Component<{}, ExampleState> {
@@ -26,6 +27,7 @@ export default class Example extends Component<{}, ExampleState> {
     layout: "fishbone2" as LayoutType,
     nodes: generateNodes(20),
     collapsed: new WeakMap<Node, boolean>(),
+    debug: false,
   };
 
   private _header: React.RefObject<HTMLDivElement> = React.createRef();
@@ -172,14 +174,20 @@ export default class Example extends Component<{}, ExampleState> {
     return !!this.state.nodes.find((node) => node.id === id);
   };
 
+  private setDebug = (debug: boolean) => {
+    this.setState({ debug });
+  };
+
   render() {
-    const { layout, nodes } = this.state;
+    const { layout, nodes, debug } = this.state;
 
     const header = (
       <Header
+        debug={debug}
         isPlaceholder={true}
         nodeCount={nodes.length}
         layout={layout}
+        setDebug={this.setDebug}
         onSelectLayout={this.onSelectLayout}
         onSelectNodeCount={this.onSelectNodeCount}
       />
@@ -206,6 +214,7 @@ export default class Example extends Component<{}, ExampleState> {
             containerStyle={this.containerStyle}
             renderNodeContainer={this.renderNodeContainer}
             renderNodeLine={this.renderNodeLine}
+            debug={debug}
           />
         )}
       </>

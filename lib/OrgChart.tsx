@@ -56,6 +56,7 @@ export interface NodeRenderContext<T> {
   assistant: boolean;
   dataId: string;
   boxId: number;
+  hidden: boolean;
 }
 
 export interface NodeContainerRenderContext<T> {
@@ -507,6 +508,7 @@ export default class OrgChart<T> extends React.Component<
         dataId: box.DataId || String(id),
         boxId: id,
         assistant: box.IsAssistant,
+        hidden: !prevNode,
       });
     }
 
@@ -644,6 +646,7 @@ export default class OrgChart<T> extends React.Component<
         dataId: dataId || String(box.Id),
         boxId: box.Id,
         assistant: box.IsAssistant,
+        hidden: false,
       });
 
       if (debug) {
@@ -820,6 +823,7 @@ export default class OrgChart<T> extends React.Component<
               dataId,
               boxId: dataBoxId,
               data,
+              hidden,
             } = context;
 
             const isValid = isValidNode(dataId);
