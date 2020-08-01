@@ -5,12 +5,14 @@ import OrgChart, {
   LayoutType,
   NodeContainerRenderContext,
   NodeContainerRenderProps,
-} from "../lib/OrgChart";
+  NodeLineRenderProps,
+  NodeLineRenderContext,
+  Animated,
+} from "../lib/";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Grid from "react-fast-grid";
 import generateNodes, { Node, isNode } from "./misc/generate-nodes";
 import Header from "./misc/Header";
-import AnimatedNodeContainer from "../lib/AnimatedNodeContainer";
 import CollapsedCards from "./misc/CollapsedCards";
 
 interface ExampleState {
@@ -57,13 +59,34 @@ export default class Example extends Component<{}, ExampleState> {
     props: NodeContainerRenderProps<Node>,
     context: NodeContainerRenderContext<Node>
   ) => (
-    <AnimatedNodeContainer
+    <Animated
       key={props.key}
       node={node}
       props={props}
       context={context}
+      getStyle={() => null}
       defaultTransition="opacity 800ms, transform 800ms"
       entranceTransition="opacity 800ms"
+    />
+  );
+
+  private renderNodeLine = (
+    node: Node,
+    props: NodeLineRenderProps<Node>,
+    context: NodeLineRenderContext<Node>
+  ) => (
+    <Animated
+      key={props.key}
+      node={node}
+      props={props}
+      context={context}
+      getStyle={() => ({
+        [context.direction === "horizontal"
+          ? "borderTop"
+          : "borderLeft"]: "2px solid rgba(255,255,255,0.15)",
+      })}
+      defaultTransition="opacity 1600ms, transform 800ms, 800ms width, 800ms height"
+      entranceTransition="opacity 1600ms"
     />
   );
 
@@ -170,22 +193,25 @@ export default class Example extends Component<{}, ExampleState> {
       <>
         {header}
         <Header {...header.props} isPlaceholder={false} ref={this._header} />
-        <OrgChart
-          // required
-          root={nodes[0]}
-          isValidNode={this.isValidNode}
-          keyGetter={this.keyGetter}
-          renderNode={this.renderNode}
-          childNodesGetter={this.childNodesGetter}
-          // optional (but recommended)
-          lineHorizontalStyle={this.lineHorizontalStyle}
-          lineVerticalStyle={this.lineVerticalStyle}
-          // optional
-          isAssistantGetter={this.isAssistantGetter}
-          layout={layout}
-          containerStyle={this.containerStyle}
-          renderNodeContainer={this.renderNodeContainer}
-        />
+        {nodes.length && (
+          <OrgChart
+            // required
+            root={nodes[0]}
+            isValidNode={this.isValidNode}
+            keyGetter={this.keyGetter}
+            renderNode={this.renderNode}
+            childNodesGetter={this.childNodesGetter}
+            // optional (but recommended)
+            lineHorizontalStyle={this.lineHorizontalStyle}
+            lineVerticalStyle={this.lineVerticalStyle}
+            // optional
+            isAssistantGetter={this.isAssistantGetter}
+            layout={layout}
+            containerStyle={this.containerStyle}
+            renderNodeContainer={this.renderNodeContainer}
+            renderNodeLine={this.renderNodeLine}
+          />
+        )}
       </>
     );
   }

@@ -102,7 +102,7 @@ export default React.forwardRef<HTMLDivElement, HeaderProps>(
                 Select Node Count: {nodeCount}
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                {[20, 50, 100, 200, 300, 500, 1000].map((count) => (
+                {[0, 20, 50, 100, 200, 300, 500, 1000].map((count) => (
                   <Dropdown.Item
                     key={count}
                     onClick={() => onSelectNodeCount(count)}

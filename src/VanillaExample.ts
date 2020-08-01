@@ -1,22 +1,24 @@
-import Diagram from "../lib/core/Diagram";
-import BoxContainer from "../lib/core/BoxContainer";
-import Box from "../lib/core/Box";
-import Operation from "../lib/core/Operation";
-import LinearLayoutStrategy from "../lib/core/LinearLayoutStrategy";
-import StackingLayoutStrategy from "../lib/core/StackingLayoutStrategy";
-import MultiLineFishboneLayoutStrategy from "../lib/core/MultiLineFishboneLayoutStrategy";
-import SingleColumnLayoutStrategy from "../lib/core/SingleColumnLayoutStrategy";
-import BranchParentAlignment from "../lib/core/BranchParentAlignment";
-import TestDataSource from "../lib/test/TestDataSource";
-import TestDataGen from "../lib/test/TestDataGen";
-import LayoutStateOperationChangedEventArgs from "../lib/core/LayoutStateOperationChangedEventArgs";
-import StackOrientation from "../lib/core/StackOrientation";
-import LayoutState from "../lib/core/LayoutState";
-import Node from "../lib/core/Node";
-import Size from "../lib/core/Size";
-import LayoutAlgorithm from "../lib/core/LayoutAlgorithm";
-import MultiLineHangerLayoutStrategy from "../lib/core/MultiLineHangerLayoutStrategy";
-import FishboneAssistantsLayoutStrategy from "../lib/core/FishboneAssistantsLayoutStrategy";
+import {
+  Diagram,
+  BoxContainer,
+  Box,
+  Operation,
+  LinearLayoutStrategy,
+  StackingLayoutStrategy,
+  MultiLineFishboneLayoutStrategy,
+  SingleColumnLayoutStrategy,
+  BranchParentAlignment,
+  LayoutStateOperationChangedEventArgs,
+  StackOrientation,
+  LayoutState,
+  Node,
+  Size,
+  LayoutAlgorithm,
+  MultiLineHangerLayoutStrategy,
+  FishboneAssistantsLayoutStrategy,
+} from "../lib";
+import TestDataSource from "../spec/utils/TestDataSource";
+import TestDataGen from "../spec/utils/TestDataGen";
 
 class ChartApp {
   diagram: Diagram | null = null;

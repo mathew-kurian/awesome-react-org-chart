@@ -1,25 +1,27 @@
 import React from "react";
-import Diagram from "./core/Diagram";
-import BoxContainer from "./core/BoxContainer";
-import LinearLayoutStrategy from "./core/LinearLayoutStrategy";
-import StackingLayoutStrategy from "./core/StackingLayoutStrategy";
-import MultiLineFishboneLayoutStrategy from "./core/MultiLineFishboneLayoutStrategy";
-import SingleColumnLayoutStrategy from "./core/SingleColumnLayoutStrategy";
-import BranchParentAlignment from "./core/BranchParentAlignment";
-import StackOrientation from "./core/StackOrientation";
-import LayoutState from "./core/LayoutState";
-import Node from "./core/Node";
-import Size from "./core/Size";
-import LayoutAlgorithm from "./core/LayoutAlgorithm";
-import MultiLineHangerLayoutStrategy from "./core/MultiLineHangerLayoutStrategy";
-import FishboneAssistantsLayoutStrategy from "./core/FishboneAssistantsLayoutStrategy";
-import IChartDataSource from "./core/IChartDataSource";
-import IChartDataItem from "./core/IChartDataItem";
-import LayoutStrategyBase from "./core/LayoutStrategyBase";
+import {
+  Diagram,
+  BoxContainer,
+  LinearLayoutStrategy,
+  StackingLayoutStrategy,
+  MultiLineFishboneLayoutStrategy,
+  SingleColumnLayoutStrategy,
+  BranchParentAlignment,
+  StackOrientation,
+  LayoutState,
+  Node,
+  Size,
+  LayoutAlgorithm,
+  MultiLineHangerLayoutStrategy,
+  FishboneAssistantsLayoutStrategy,
+  IChartDataSource,
+  IChartDataItem,
+  LayoutStrategyBase,
+} from "./core";
 
 const NOOP_SIZE = new Size(5, 5);
 
-export interface Rect {
+export interface SimpleRect {
   top: number;
   left: number;
   height: number;
@@ -33,7 +35,7 @@ export interface CSSRect {
   width: number | string;
 }
 
-export interface BoundaryRect extends Rect {
+export interface BoundaryRect extends SimpleRect {
   branchTop: number;
   branchLeft: number;
 }
@@ -62,6 +64,7 @@ export interface NodeContainerRenderContext<T> {
 
 export interface NodeLineRenderContext<T> {
   hidden: boolean;
+  direction: LineRenderContext<T>["direction"];
 }
 
 export type LayoutType =
@@ -163,6 +166,7 @@ export default class OrgChart<T> extends React.Component<
     renderIndex: 0,
   };
 
+  private _mounted: boolean = true;
   private _container: React.RefObject<HTMLDivElement> = React.createRef();
 
   private static assignStrategies(diagram: Diagram): LayoutStrategyBase[] {
@@ -361,6 +365,10 @@ export default class OrgChart<T> extends React.Component<
     return "hanger4";
   }
 
+  componentWillUnmount() {
+    this._mounted = true;
+  }
+
   static getDerivedStateFromProps<T>(
     props: OrgChartProps<T>,
     state: OrgChartState<T>
@@ -514,6 +522,10 @@ export default class OrgChart<T> extends React.Component<
       return;
     }
 
+    if (!this._mounted) {
+      return;
+    }
+
     const { diagram, renderIndex } = this.state;
     const { debug } = this.props;
 
@@ -536,6 +548,10 @@ export default class OrgChart<T> extends React.Component<
 
   private drawDiagram(diagram: OrgChartDiagram<T>, debug?: boolean) {
     if (diagram !== this.state.diagram) {
+      return;
+    }
+
+    if (diagram.DataSource.AllDataItemIds.length === 0) {
       return;
     }
 
@@ -786,7 +802,7 @@ export default class OrgChart<T> extends React.Component<
               };
 
               if (typeof renderNodeLine === "function") {
-                return renderNodeLine(data, props, { hidden });
+                return renderNodeLine(data, props, { hidden, direction });
               }
 
               // props.style = { ...props.style };

@@ -1,5 +1,5 @@
-import TestDataSource from "../../lib/test/TestDataSource";
-import TestDataGen from "../../lib/test/TestDataGen";
+import TestDataSource from "../../spec/utils/TestDataSource";
+import TestDataGen from "../../spec/utils/TestDataGen";
 import faker from "faker";
 
 export interface Node {
@@ -53,6 +53,10 @@ export default (count: number) => {
   const dataSource = new TestDataSource();
 
   new TestDataGen().GenerateDataItems(dataSource, count, percentAssistants);
+
+  if (dataSource.AllDataItemIds.length === 0) {
+    return [];
+  }
 
   const nodeMap: Map<string, Node> = new Map();
 
