@@ -2,8 +2,8 @@
   "name": "awesome-react-org-chart",
   "version": "0.0.0-semantic-release",
   "description": "Renders large organization charts with multiple compaction/packing techniques to improve readability and accessibility.",
-  "main": "./dist/lib/OrgChart.js",
-  "typings": "./dist/lib/OrgChart.d.ts",
+  "main": "./dist/OrgChart.js",
+  "typings": "./dist/OrgChart.d.ts",
   "peerDependencies": {
     "react": ">=15",
     "react-dom": ">=15"
@@ -27,9 +27,9 @@
     "build": "export NODE_ENV=production; npx npm-run-all --parallel build-app build-lib",
     "watch": "export NODE_ENV=development; npx npm-run-all --parallel watch-app watch-lib",
     "build-app": "export NODE_ENV=production; rm -r ./public/scripts; npx webpack --config webpack.config.js",
-    "build-lib": "export NODE_ENV=production; npx tsc",
+    "build-lib": "export NODE_ENV=production; rm -r ./dist; npx tsc --project tsconfig-build.json",
     "watch-app": "export NODE_ENV=development; npx webpack --config webpack.config.js",
-    "watch-lib": "export NODE_ENV=development; npx tsc-watch"
+    "watch-lib": "export NODE_ENV=development; rm -r ./dist; npx tsc-watch"
   },
   "author": "Mathew Kurian",
   "license": "MIT",

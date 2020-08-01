@@ -118,6 +118,7 @@ interface OrgChartProps<T> {
   assistantLayout?: AssistantLayoutType | LayoutStrategyBase;
   containerStyle?: React.CSSProperties;
   nodeContainerStyle?: React.CSSProperties;
+  isValidNode: (id: string) => boolean;
   renderNode: (node: T) => React.ReactElement;
   renderNodeContainer?: (
     node: T,
@@ -723,6 +724,7 @@ export default class OrgChart<T> extends React.Component<
       renderNodeContainer,
       renderNodeLine,
       nodeContainerStyle,
+      isValidNode,
     } = this.props;
 
     const lineClassNames: Record<
@@ -761,6 +763,12 @@ export default class OrgChart<T> extends React.Component<
               dataId,
               index,
             }) => {
+              const isValid = isValidNode(dataId);
+
+              if (!isValid) {
+                return null;
+              }
+
               const props: NodeLineRenderProps<T> = {
                 "data-line-assistant": assistant,
                 "data-line-direction": direction,
@@ -793,15 +801,22 @@ export default class OrgChart<T> extends React.Component<
           {nodes.map((context) => {
             const {
               rect: { top, left, width, height },
-              dataId: key,
+              dataId,
               boxId: dataBoxId,
               data,
             } = context;
+
+            const isValid = isValidNode(dataId);
+
+            if (!isValid) {
+              return null;
+            }
+
             const children = renderNode(data);
             const props: NodeContainerRenderProps<T> = {
               "data-box-id": String(dataBoxId),
               children,
-              key,
+              key: dataId,
               style: {
                 left: 0,
                 top: 0,

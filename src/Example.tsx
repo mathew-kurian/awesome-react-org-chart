@@ -149,6 +149,10 @@ export default class Example extends Component<{}, ExampleState> {
   private onSelectNodeCount = (count: number) =>
     this.setState({ nodes: generateNodes(count) });
 
+  private isValidNode = (id: string): boolean => {
+    return !!this.state.nodes.find((node) => node.id === id);
+  };
+
   render() {
     const { layout, nodes } = this.state;
 
@@ -169,6 +173,7 @@ export default class Example extends Component<{}, ExampleState> {
         <OrgChart
           // required
           root={nodes[0]}
+          isValidNode={this.isValidNode}
           keyGetter={this.keyGetter}
           renderNode={this.renderNode}
           childNodesGetter={this.childNodesGetter}
