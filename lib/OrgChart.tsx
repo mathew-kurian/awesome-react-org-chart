@@ -368,6 +368,8 @@ export default class OrgChart<T> extends React.Component<
 
   componentWillUnmount() {
     this._mounted = true;
+
+    clearTimeout(this._tid);
   }
 
   static getDerivedStateFromProps<T>(
@@ -517,6 +519,7 @@ export default class OrgChart<T> extends React.Component<
     return { hidden: true, nodes };
   }
 
+  private _tid: any = null;
   private _lastRenderIndex: number = 0;
   private safelyDrawDiagram() {
     if (this.props !== this.state.prevProps) {
@@ -535,7 +538,15 @@ export default class OrgChart<T> extends React.Component<
       this._lastRenderIndex = renderIndex;
 
       if (diagram) {
-        this.drawDiagram(diagram, debug);
+        clearTimeout(this._tid);
+
+        this._tid = setTimeout(() => {
+          if (this._lastRenderIndex !== renderIndex) {
+            return;
+          }
+
+          this.drawDiagram(diagram, debug);
+        }, 0);
       }
     }
   }

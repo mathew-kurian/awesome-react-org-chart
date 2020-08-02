@@ -5,7 +5,8 @@
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "peerDependencies": {
-    "react": ">=15"
+    "react": ">=15",
+    "react-dom": ">=15"
   },
   "dependencies": {
     "react-transition-group": "^4.0.0"
