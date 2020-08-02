@@ -209,7 +209,7 @@ export default class Example extends Component<{}, ExampleState> {
             lineHorizontalStyle={this.lineHorizontalStyle}
             lineVerticalStyle={this.lineVerticalStyle}
             // optional
-            measureStrategy="timeout"
+            measureStrategy="effect"
             isAssistantGetter={this.isAssistantGetter} // wip
             layout={layout}
             containerStyle={this.containerStyle}

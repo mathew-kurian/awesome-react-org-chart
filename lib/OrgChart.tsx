@@ -145,7 +145,7 @@ interface OrgChartProps<T> {
 
   // debug / perf
   measureTimeoutDelay?: number;
-  measureStrategy?: "effect" | "timeout";
+  measureStrategy?: "effect" | "timeout" | "idle" | "animation-frame";
   debug?: boolean;
 }
 
@@ -393,6 +393,13 @@ export default class OrgChart<T> extends React.Component<
     this._mounted = true;
 
     clearTimeout(this._tid);
+    cancelAnimationFrame(this._tid);
+
+    // @ts-ignore
+    if (typeof window.cancelIdleCallback === "function") {
+      // @ts-ignore
+      window.cancelIdleCallback(this._tid);
+    }
   }
 
   static getDerivedStateFromProps<T>(
@@ -547,7 +554,7 @@ export default class OrgChart<T> extends React.Component<
 
   private _tid: any = null;
   private _lastRenderIndex: number = 0;
-  private safelyDrawDiagram = (options: { immediate?: boolean }) => {
+  private safelyDrawDiagram = () => {
     if (this.props !== this.state.prevProps) {
       // this.setState({});
       return;
@@ -558,7 +565,11 @@ export default class OrgChart<T> extends React.Component<
     }
 
     const { diagram, renderIndex } = this.state;
-    const { debug, measureTimeoutDelay = 0 } = this.props;
+    const {
+      debug,
+      measureTimeoutDelay = 0,
+      measureStrategy = "timeout",
+    } = this.props;
 
     if (renderIndex > this._lastRenderIndex) {
       this._lastRenderIndex = renderIndex;
@@ -572,8 +583,19 @@ export default class OrgChart<T> extends React.Component<
           this.drawDiagram(diagram, debug);
         };
 
-        if (options.immediate) {
+        if (measureStrategy === "effect") {
+          // call immediately since it's invoked by the effect strategy
           onDOMUpdateComplete();
+        } else if (measureStrategy === "idle") {
+          // @ts-ignore
+          window.cancelIdleCallback(this._tid);
+
+          // @ts-ignore
+          this._tid = window.requestIdleCallback(onDOMUpdateComplete);
+        } else if (measureStrategy === "animation-frame") {
+          window.cancelAnimationFrame(this._tid);
+
+          this._tid = window.requestAnimationFrame(onDOMUpdateComplete);
         } else {
           clearTimeout(this._tid);
 
@@ -583,22 +605,13 @@ export default class OrgChart<T> extends React.Component<
     }
   };
 
-  private isRenderOnEffect() {
+  componentDidMount = (this.componentDidUpdate = () => {
     const { measureStrategy } = this.props;
 
-    return (
-      typeof React.useEffect === "function" &&
-      (measureStrategy == null || measureStrategy == "effect")
-    );
-  }
-
-  componentDidMount() {
-    this.safelyDrawDiagram({ immediate: this.isRenderOnEffect() });
-  }
-
-  componentDidUpdate() {
-    this.safelyDrawDiagram({ immediate: this.isRenderOnEffect() });
-  }
+    if (measureStrategy !== "effect") {
+      this.safelyDrawDiagram();
+    }
+  });
 
   private drawDiagram(diagram: OrgChartDiagram<T>, debug?: boolean) {
     if (diagram !== this.state.diagram) {
@@ -796,6 +809,7 @@ export default class OrgChart<T> extends React.Component<
       renderNodeLine,
       nodeContainerStyle,
       isValidNode,
+      measureStrategy,
     } = this.props;
 
     const lineClassNames: Record<
@@ -814,11 +828,8 @@ export default class OrgChart<T> extends React.Component<
       horizontal: lineHorizontalStyle,
     };
 
-    const isRenderOnEffect = this.isRenderOnEffect();
-
-    let handleEffect: (() => void) | null = isRenderOnEffect
-      ? () => this.safelyDrawDiagram({ immediate: true })
-      : null;
+    let handleEffect: (() => void) | null =
+      measureStrategy === "effect" ? () => this.safelyDrawDiagram() : null;
 
     return (
       <div
