@@ -209,7 +209,8 @@ export default class Example extends Component<{}, ExampleState> {
             lineHorizontalStyle={this.lineHorizontalStyle}
             lineVerticalStyle={this.lineVerticalStyle}
             // optional
-            isAssistantGetter={this.isAssistantGetter}
+            measureStrategy="timeout"
+            isAssistantGetter={this.isAssistantGetter} // wip
             layout={layout}
             containerStyle={this.containerStyle}
             renderNodeContainer={this.renderNodeContainer}

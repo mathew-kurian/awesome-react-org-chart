@@ -4,6 +4,7 @@ import {
   NodeContainerRenderProps,
   NodeLineRenderProps,
   NodeLineRenderContext,
+  DrawStage,
 } from "./OrgChart";
 import { Transition } from "react-transition-group";
 
@@ -53,10 +54,14 @@ export default class Animated<T> extends React.Component<
       exited: { opacity: 0 },
     };
 
+    const visible =
+      context.drawStage === DrawStage.RENDER ||
+      context.drawStage === DrawStage.MEASURE_VISIBLE;
+
     return (
       <Transition
-        in={entered || !context.hidden}
-        appear={!context.hidden}
+        in={entered || visible}
+        appear={visible}
         timeout={duration}
         exit={false}
         onEntered={() => this.setState({ entered: true })}
