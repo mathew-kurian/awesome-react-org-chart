@@ -168,7 +168,7 @@ export default class OrgChart<T> extends React.Component<
   };
 
   private _mounted: boolean = true;
-  private _container: React.RefObject<HTMLDivElement> = React.createRef();
+  private _container: HTMLDivElement | null = null;
 
   private static assignStrategies(diagram: Diagram): LayoutStrategyBase[] {
     const strategies: LayoutStrategyBase[] = [];
@@ -559,7 +559,7 @@ export default class OrgChart<T> extends React.Component<
 
     const state = new LayoutState(diagram);
     const nodeMap: Map<number, HTMLDivElement> = new Map();
-    const container: HTMLDivElement | null = this._container.current;
+    const container: HTMLDivElement | null = this._container;
 
     if (container) {
       container.querySelectorAll("[data-box-id]").forEach((node: Element) => {
@@ -590,7 +590,7 @@ export default class OrgChart<T> extends React.Component<
 
           const rect = element.getBoundingClientRect();
 
-          return new Size(rect.width, rect.height);
+          return new Size(rect.width || 1, rect.height || 1);
         }
       }
 
@@ -770,7 +770,7 @@ export default class OrgChart<T> extends React.Component<
           position: "relative",
           ...containerStyle,
         }}
-        ref={this._container}
+        ref={(ref) => (this._container = ref)}
       >
         <div>
           {lines.map(
