@@ -5,15 +5,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Button from "react-bootstrap/Button";
 import Grid from "react-fast-grid";
 
-const layouts: LayoutType[] = [
-  "linear",
-  "smart",
-  "fishbone1",
-  "fishbone2",
-  "singleColumnRight",
-  "singleColumnLeft",
-  "stackers",
-];
+const layouts: LayoutType[] = Object.values(LayoutType);
 
 interface HeaderProps {
   isPlaceholder: boolean;

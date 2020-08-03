@@ -24,7 +24,7 @@ interface ExampleState {
 
 export default class Example extends Component<{}, ExampleState> {
   state = {
-    layout: "fishbone2" as LayoutType,
+    layout: LayoutType.FISHBONE_1,
     nodes: generateNodes(20),
     collapsed: new WeakMap<Node, boolean>(),
     debug: false,

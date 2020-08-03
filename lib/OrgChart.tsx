@@ -74,14 +74,18 @@ export interface NodeLineRenderContext<T> {
   direction: LineRenderContext<T>["direction"];
 }
 
-export type LayoutType =
-  | "linear"
-  | "smart"
-  | "fishbone1"
-  | "fishbone2"
-  | "singleColumnRight"
-  | "singleColumnLeft"
-  | "stackers";
+export enum LayoutType {
+  LINEAR = "linear",
+  SMART = "smart",
+  FISHBONE_1 = "fishbone1",
+  FISHBONE_2 = "fishbone2",
+  FISHBONE_3 = "fishbone3",
+  FISHBONE_4 = "fishbone4",
+  SINGLE_COLUMN_RIGHT = "singleColumnRight",
+  SINGLE_COLUMN_LEFT = "singleColumnLeft",
+  STACKERS = "stackers",
+  ASSISTANTS = "assistants",
+}
 
 interface OrgChartDataItem<T> extends IChartDataItem {
   data: T;
@@ -113,8 +117,6 @@ export type NodeLineRenderProps<T> = {
   key: string;
 };
 
-export type AssistantLayoutType = LayoutType | "assistants";
-
 interface OrgChartProps<T> {
   root: T;
   keyGetter: (node: T) => string;
@@ -125,7 +127,7 @@ interface OrgChartProps<T> {
   lineVerticalStyle?: React.CSSProperties;
   lineHorizontalStyle?: React.CSSProperties;
   layout?: LayoutType | LayoutStrategyBase;
-  assistantLayout?: AssistantLayoutType | LayoutStrategyBase;
+  assistantLayout?: LayoutType | LayoutStrategyBase;
   containerStyle?: React.CSSProperties;
   nodeContainerStyle?: React.CSSProperties;
   isValidNode: (id: string) => boolean;
@@ -142,10 +144,16 @@ interface OrgChartProps<T> {
   ) => React.ReactElement;
   parentSpacing?: number;
   siblingSpacing?: number;
+  // maxGroups?: number;
 
   // debug / perf
   measureTimeoutDelay?: number;
-  measureStrategy?: "effect" | "timeout" | "idle" | "animation-frame";
+  measureStrategy?:
+    | "effect"
+    | "timeout"
+    | "idle"
+    | "animation-frame"
+    | "immediate";
   debug?: boolean;
 }
 
@@ -243,12 +251,23 @@ export default class OrgChart<T> extends React.Component<
     diagram.LayoutSettings.LayoutStrategies.set("fishbone2", strategy);
 
     strategies.push(strategy);
+    strategy = new MultiLineFishboneLayoutStrategy();
+    strategy.ParentAlignment = BranchParentAlignment.Center;
+    (strategy as MultiLineFishboneLayoutStrategy).MaxGroups = 3;
+    diagram.LayoutSettings.LayoutStrategies.set("fishbone3", strategy);
+
+    strategies.push(strategy);
+    strategy = new MultiLineFishboneLayoutStrategy();
+    strategy.ParentAlignment = BranchParentAlignment.Center;
+    (strategy as MultiLineFishboneLayoutStrategy).MaxGroups = 4;
+    diagram.LayoutSettings.LayoutStrategies.set("fishbone4", strategy);
+
+    strategies.push(strategy);
 
     strategy = new StackingLayoutStrategy();
     strategy.ParentAlignment = BranchParentAlignment.InvalidValue;
     (strategy as StackingLayoutStrategy).Orientation =
       StackOrientation.SingleRowHorizontal;
-    strategy.ParentChildSpacing = 10;
     diagram.LayoutSettings.LayoutStrategies.set("hstack", strategy);
 
     strategies.push(strategy);
@@ -257,7 +276,6 @@ export default class OrgChart<T> extends React.Component<
     strategy.ParentAlignment = BranchParentAlignment.InvalidValue;
     (strategy as StackingLayoutStrategy).Orientation =
       StackOrientation.SingleColumnVertical;
-    strategy.ParentChildSpacing = 10;
     diagram.LayoutSettings.LayoutStrategies.set("vstack", strategy);
 
     strategies.push(strategy);
@@ -266,7 +284,6 @@ export default class OrgChart<T> extends React.Component<
     strategy.ParentAlignment = BranchParentAlignment.InvalidValue;
     (strategy as StackingLayoutStrategy).Orientation =
       StackOrientation.SingleColumnVertical;
-    strategy.SiblingSpacing = 20;
     diagram.LayoutSettings.LayoutStrategies.set("vstackMiddle", strategy);
 
     strategies.push(strategy);
@@ -275,7 +292,6 @@ export default class OrgChart<T> extends React.Component<
     strategy.ParentAlignment = BranchParentAlignment.InvalidValue;
     (strategy as StackingLayoutStrategy).Orientation =
       StackOrientation.SingleColumnVertical;
-    strategy.SiblingSpacing = 50;
     diagram.LayoutSettings.LayoutStrategies.set("vstackTop", strategy);
 
     strategies.push(strategy);
@@ -477,10 +493,10 @@ export default class OrgChart<T> extends React.Component<
   }
 
   private onComputeBranchOptimizer = (node: Node): string | null => {
-    const { layout = "linear" } = this.props;
+    const { layout = LayoutType.LINEAR } = this.props;
 
     if (node.IsAssistantRoot) {
-      const { assistantLayout = "assistants" } = this.props;
+      const { assistantLayout = LayoutType.ASSISTANTS } = this.props;
 
       if (assistantLayout instanceof LayoutStrategyBase) {
         return "assistantCustom";
@@ -583,7 +599,7 @@ export default class OrgChart<T> extends React.Component<
           this.drawDiagram(diagram, debug);
         };
 
-        if (measureStrategy === "effect") {
+        if (measureStrategy === "effect" || measureStrategy === "immediate") {
           // call immediately since it's invoked by the effect strategy
           onDOMUpdateComplete();
         } else if (measureStrategy === "idle") {
