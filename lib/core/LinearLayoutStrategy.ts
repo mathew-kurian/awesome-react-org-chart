@@ -220,7 +220,7 @@ export default class LinearLayoutStrategy extends LayoutStrategyBase {
         new Point(
           center,
           this.ConnectorAlignment === ConnectorAlignment.Center
-            ? rootRect.CenterV
+            ? node.Children[0].State.CenterV
             : node.Children[0].State.Top
         )
       );
