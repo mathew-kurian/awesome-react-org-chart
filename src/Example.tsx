@@ -210,6 +210,7 @@ export default class Example extends Component<{}, ExampleState> {
             lineHorizontalStyle={this.lineHorizontalStyle}
             lineVerticalStyle={this.lineVerticalStyle}
             // optional
+            onRenderComplete={(width, height) => console.log({ width, height })}
             measureStrategy="effect"
             connectorAlignment={ConnectorAlignment.Center}
             connectorWidth={2}

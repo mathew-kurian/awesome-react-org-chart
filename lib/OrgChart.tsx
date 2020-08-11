@@ -147,6 +147,7 @@ interface OrgChartProps<T> {
   siblingSpacing?: number;
   connectorAlignment?: ConnectorAlignment;
   connectorWidth?: number;
+  onRenderComplete?: (width: number, height: number) => void;
   // maxGroups?: number;
 
   // debug / perf
@@ -801,14 +802,25 @@ export default class OrgChart<T> extends React.Component<
       return true;
     });
 
-    this.setState({
-      width: diagramBoundary.Size.Width,
-      height: diagramBoundary.Size.Height,
-      lines,
-      nodes,
-      boundaries,
-      drawStage: DrawStage.RENDER,
-    });
+    const { onRenderComplete } = this.props;
+    const width = diagramBoundary.Size.Width;
+    const height = diagramBoundary.Size.Height;
+
+    this.setState(
+      {
+        width,
+        height,
+        lines,
+        nodes,
+        boundaries,
+        drawStage: DrawStage.RENDER,
+      },
+      () => {
+        if (onRenderComplete) {
+          onRenderComplete(width, height);
+        }
+      }
+    );
   }
 
   render() {
