@@ -23,6 +23,7 @@ import OrgChart from "awesome-react-org-chart";
   lineVerticalStyle={this.lineVerticalStyle}
   // optional
   measureStrategy="effect"
+  connectorThickness={2}
   connectorAlignment={ConnectorAlignment.Center}
   isAssistantGetter={this.isAssistantGetter} // wip
   layout={layout}

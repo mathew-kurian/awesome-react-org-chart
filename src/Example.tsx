@@ -213,7 +213,7 @@ export default class Example extends Component<{}, ExampleState> {
             onRenderComplete={(width, height) => console.log({ width, height })}
             measureStrategy="effect"
             connectorAlignment={ConnectorAlignment.Center}
-            connectorWidth={2}
+            connectorThickness={2}
             isAssistantGetter={this.isAssistantGetter} // wip
             layout={layout}
             containerStyle={this.containerStyle}

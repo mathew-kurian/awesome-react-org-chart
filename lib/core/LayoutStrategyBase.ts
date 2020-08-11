@@ -6,7 +6,7 @@ import ConnectorAlignment from "./ConnectorAlignment";
 
 export default abstract class LayoutStrategyBase {
   ConnectorAlignment = ConnectorAlignment.Edge;
-  ConnectorWidth: number = 0;
+  ConnectorThickness: number = 0;
   ParentAlignment: BranchParentAlignment = BranchParentAlignment.InvalidValue;
   ParentChildSpacing: number = 20;
   ParentConnectorShield: number = 50;

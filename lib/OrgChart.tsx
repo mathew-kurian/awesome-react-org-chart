@@ -146,7 +146,7 @@ interface OrgChartProps<T> {
   parentSpacing?: number;
   siblingSpacing?: number;
   connectorAlignment?: ConnectorAlignment;
-  connectorWidth?: number;
+  connectorThickness?: number;
   onRenderComplete?: (width: number, height: number) => void;
   // maxGroups?: number;
 
@@ -467,7 +467,7 @@ export default class OrgChart<T> extends React.Component<
       parentSpacing = 40,
       siblingSpacing = 30,
       connectorAlignment = ConnectorAlignment.Edge,
-      connectorWidth = 1,
+      connectorThickness = 1,
     } = props;
 
     const dataSource = OrgChart.getDataSource(props);
@@ -494,7 +494,7 @@ export default class OrgChart<T> extends React.Component<
       strategy.ParentChildSpacing = parentSpacing;
       strategy.SiblingSpacing = siblingSpacing;
       strategy.ConnectorAlignment = connectorAlignment;
-      strategy.ConnectorWidth = connectorWidth;
+      strategy.ConnectorThickness = connectorThickness;
     }
 
     return diagram;

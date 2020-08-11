@@ -540,7 +540,7 @@ export default class MultiLineFishboneLayoutStrategy extends LinearLayoutStrateg
             : isLeft
             ? node.Children[i].State.Right
             : node.Children[i].State.Left;
-        let y = node.Children[i].State.CenterV - this.ConnectorWidth;
+        let y = node.Children[i].State.CenterV - this.ConnectorThickness;
         segments[ix++] = new Edge(new Point(from, y), new Point(to, y));
 
         if (++countOnThisSide == iterator.MaxOnLeft) {
