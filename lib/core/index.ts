@@ -24,6 +24,9 @@ export { default as BoxTree } from "./BoxTree";
 export * from "./BranchParentAlignment";
 export { default as BranchParentAlignment } from "./BranchParentAlignment";
 
+export * from "./ConnectorAlignment";
+export { default as ConnectorAlignment } from "./ConnectorAlignment";
+
 export * from "./Connector";
 export { default as Connector } from "./Connector";
 

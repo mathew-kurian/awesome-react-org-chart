@@ -2,8 +2,10 @@ import BranchParentAlignment from "./BranchParentAlignment";
 import LayoutState from "./LayoutState";
 import Node from "./Node";
 import LayoutLevel from "./LayoutLevel";
+import ConnectorAlignment from "./ConnectorAlignment";
 
 export default abstract class LayoutStrategyBase {
+  ConnectorAlignment = ConnectorAlignment.Edge;
   ParentAlignment: BranchParentAlignment = BranchParentAlignment.InvalidValue;
   ParentChildSpacing: number = 20;
   ParentConnectorShield: number = 50;

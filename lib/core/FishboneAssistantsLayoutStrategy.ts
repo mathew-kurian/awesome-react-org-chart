@@ -9,6 +9,7 @@ import Rect from "./Rect";
 import Edge from "./Edge";
 import Point from "./Point";
 import Connector from "./Connector";
+import ConnectorAlignment from "./ConnectorAlignment";
 
 export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase {
   /// <summary>
@@ -22,13 +23,15 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
       // using column == group here,
       // and each group consists of two vertical stretches of boxes with a vertical carrier in between
       node.State.NumberOfSiblingColumns = 1;
-      node.State.NumberOfSiblingRows = Math.floor(node.State.NumberOfSiblings / 2);
+      node.State.NumberOfSiblingRows = Math.floor(
+        node.State.NumberOfSiblings / 2
+      );
       if (node.State.NumberOfSiblings % 2 != 0) {
         node.State.NumberOfSiblingRows++;
       }
 
       // a vertical carrier from parent
-      var spacer = Box.Special(Box.None, node.Element.Id, false);
+      let spacer = Box.Special(Box.None, node.Element.Id, false);
       node.AddRegularChildBox(spacer);
     }
   }
@@ -50,7 +53,7 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
     let prevRowBottom = node.State.SiblingsRowV.To;
     const maxOnLeft = this.MaxOnLeft(node);
 
-    for (var i = 0; i < maxOnLeft; i++) {
+    for (let i = 0; i < maxOnLeft; i++) {
       const spacing = i == 0 ? this.ParentChildSpacing : this.SiblingSpacing;
 
       const child = node.Children[i];
@@ -109,7 +112,7 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
   /// Applies layout changes to a given box and its children.
   /// </summary>
   public ApplyHorizontalLayout(state: LayoutState, level: LayoutLevel): void {
-    var node = level.BranchRoot;
+    let node = level.BranchRoot;
     if (node.Level == 0) {
       node.State.SiblingsRowV = new Dimensions(
         node.State.Top,
@@ -117,11 +120,11 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
       );
     }
 
-    var left = true;
-    var countOnThisSide = 0;
-    var maxOnLeft = this.MaxOnLeft(node);
-    for (var i = 0; i < node.State.NumberOfSiblings; i++) {
-      var child = node.Children[i];
+    let left = true;
+    let countOnThisSide = 0;
+    let maxOnLeft = this.MaxOnLeft(node);
+    for (let i = 0; i < node.State.NumberOfSiblings; i++) {
+      let child = node.Children[i];
       LayoutAlgorithm.HorizontalLayout(state, child);
 
       // we go top-bottom to layout left side of the group,
@@ -139,8 +142,8 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
           left = false;
           countOnThisSide = 0;
 
-          var rightmost = Number.MIN_VALUE;
-          for (var k = 0; k <= i; k++) {
+          let rightmost = Number.MIN_VALUE;
+          for (let k = 0; k <= i; k++) {
             rightmost = Math.max(
               rightmost,
               node.Children[k].State.BranchExterior.Right
@@ -152,7 +155,7 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
           if (node.State.NumberOfSiblings % 2 != 0) {
             rightmost = Math.max(rightmost, child.State.Right);
           } else {
-            var opposite = node.Children[node.State.NumberOfSiblings - 1];
+            let opposite = node.Children[node.State.NumberOfSiblings - 1];
             if (opposite.Element.IsCollapsed || opposite.ChildCount == 0) {
               rightmost = Math.max(rightmost, child.State.Right);
             } else {
@@ -198,7 +201,7 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
   /// Allocates and routes connectors.
   /// </summary>
   public RouteConnectors(state: LayoutState, node: Node): void {
-    var count = node.State.NumberOfSiblings;
+    let count = node.State.NumberOfSiblings;
     if (count == 0) {
       return;
     }
@@ -207,23 +210,25 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
       count++;
     }
 
-    var segments: Edge[] = [];
-
-    var ix = 0;
+    let segments: Edge[] = [];
+    let ix = 0;
 
     // one hook for each child
-    var maxOnLeft = this.MaxOnLeft(node);
-    var carrier = node.Children[node.State.NumberOfSiblings].State;
-    var from = carrier.CenterH;
+    let maxOnLeft = this.MaxOnLeft(node);
+    let carrier = node.Children[node.State.NumberOfSiblings].State;
+    let from = carrier.CenterH;
+    let isLeft = true;
+    let countOnThisSide = 0;
+    let bottomMost = Number.MIN_VALUE;
 
-    var isLeft = true;
-    var countOnThisSide = 0;
-    var bottomMost = Number.MIN_VALUE;
-    for (var i = 0; i < node.State.NumberOfSiblings; i++) {
-      var to = isLeft
-        ? node.Children[i].State.Right
-        : node.Children[i].State.Left;
-      var y = node.Children[i].State.CenterV;
+    for (let i = 0; i < node.State.NumberOfSiblings; i++) {
+      let to =
+        this.ConnectorAlignment === ConnectorAlignment.Center
+          ? node.Children[i].State.CenterH
+          : isLeft
+          ? node.Children[i].State.Right
+          : node.Children[i].State.Left;
+      let y = node.Children[i].State.CenterV;
       bottomMost = Math.max(bottomMost, y);
       segments[ix++] = new Edge(new Point(from, y), new Point(to, y));
 
@@ -251,14 +256,15 @@ export default class FishboneAssistantsLayoutStrategy extends LayoutStrategyBase
   public GetSupportsAssistants = () => false;
 
   private MaxOnLeft = (node: Node): number =>
-    Math.floor(node.State.NumberOfSiblings / 2) + (node.State.NumberOfSiblings % 2);
+    Math.floor(node.State.NumberOfSiblings / 2) +
+    (node.State.NumberOfSiblings % 2);
   private NeedCarrierProtector = (node: Node): boolean =>
     node.ParentNode?.ChildCount == 0;
 
   private EnumerateSiblings(node: Node, from: number, to: number): Node[] {
     const nodes: Node[] = [];
 
-    for (var i = from; i < to; i++) {
+    for (let i = from; i < to; i++) {
       nodes.push(node.Children[i]);
     }
 

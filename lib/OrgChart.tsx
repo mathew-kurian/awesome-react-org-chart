@@ -17,6 +17,7 @@ import {
   IChartDataSource,
   IChartDataItem,
   LayoutStrategyBase,
+  ConnectorAlignment,
 } from "./core";
 
 const NOOP_SIZE = new Size(5, 5);
@@ -144,6 +145,7 @@ interface OrgChartProps<T> {
   ) => React.ReactElement;
   parentSpacing?: number;
   siblingSpacing?: number;
+  connectorAlignment?: ConnectorAlignment;
   // maxGroups?: number;
 
   // debug / perf
@@ -462,6 +464,7 @@ export default class OrgChart<T> extends React.Component<
       assistantLayout,
       parentSpacing = 40,
       siblingSpacing = 30,
+      connectorAlignment = ConnectorAlignment.Edge,
     } = props;
 
     const dataSource = OrgChart.getDataSource(props);
@@ -487,6 +490,7 @@ export default class OrgChart<T> extends React.Component<
       strategy.ChildConnectorHookLength = parentSpacing / 2;
       strategy.ParentChildSpacing = parentSpacing;
       strategy.SiblingSpacing = siblingSpacing;
+      strategy.ConnectorAlignment = connectorAlignment;
     }
 
     return diagram;
