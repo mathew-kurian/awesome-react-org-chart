@@ -212,6 +212,7 @@ export default class Example extends Component<{}, ExampleState> {
             // optional
             measureStrategy="effect"
             connectorAlignment={ConnectorAlignment.Center}
+            connectorWidth={2}
             isAssistantGetter={this.isAssistantGetter} // wip
             layout={layout}
             containerStyle={this.containerStyle}
