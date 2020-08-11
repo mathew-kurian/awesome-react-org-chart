@@ -10,6 +10,7 @@ import BranchParentAlignment from "./BranchParentAlignment";
 import Rect from "./Rect";
 import Edge from "./Edge";
 import Connector from "./Connector";
+import ConnectorAlignment from "./ConnectorAlignment";
 
 export default class LinearLayoutStrategy extends LayoutStrategyBase {
   /// <summary>
@@ -210,22 +211,34 @@ export default class LinearLayoutStrategy extends LayoutStrategyBase {
 
     if (count == 1) {
       segments[0] = new Edge(
-        new Point(center, rootRect.Bottom),
-        new Point(center, node.Children[0].State.Top)
+        new Point(
+          center,
+          this.ConnectorAlignment === ConnectorAlignment.Center
+            ? rootRect.CenterV
+            : rootRect.Bottom
+        ),
+        new Point(
+          center,
+          this.ConnectorAlignment === ConnectorAlignment.Center
+            ? rootRect.CenterV
+            : node.Children[0].State.Top
+        )
       );
     } else {
       if (node.Children[0].State.SiblingsRowV == null) {
         throw Error("SiblingsRowV is null");
       }
 
-      let space = node.Children[0].State.SiblingsRowV.From - rootRect.Bottom;
+      const rootRectV =
+        this.ConnectorAlignment === ConnectorAlignment.Center
+          ? rootRect.CenterV
+          : rootRect.Bottom;
+
+      let space = node.Children[0].State.SiblingsRowV.From - rootRectV;
 
       segments[0] = new Edge(
-        new Point(center, rootRect.Bottom),
-        new Point(
-          center,
-          rootRect.Bottom + space - this.ChildConnectorHookLength
-        )
+        new Point(center, rootRectV),
+        new Point(center, rootRectV + space - this.ChildConnectorHookLength)
       );
 
       for (let i = 0; i < normalChildCount; i++) {

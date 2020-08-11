@@ -11,6 +11,7 @@ import Edge from "./Edge";
 import Point from "./Point";
 import Connector from "./Connector";
 import Rect from "./Rect";
+import ConnectorAlignment from "./ConnectorAlignment";
 
 class GroupIterator {
   private _numberOfSiblings: number;
@@ -504,11 +505,16 @@ export default class MultiLineFishboneLayoutStrategy extends LinearLayoutStrateg
       throw Error("SiblingsRowV is null");
     }
 
+    const rootRectV =
+      this.ConnectorAlignment === ConnectorAlignment.Center
+        ? rootRect.CenterV
+        : rootRect.Bottom;
+
     // parent connector
-    let space = node.Children[0].State.SiblingsRowV.From - rootRect.Bottom;
+    let space = node.Children[0].State.SiblingsRowV.From - rootRectV;
     segments[ix++] = new Edge(
-      new Point(center, rootRect.Bottom),
-      new Point(center, rootRect.Bottom + space - this.ChildConnectorHookLength)
+      new Point(center, rootRectV),
+      new Point(center, rootRectV + space - this.ChildConnectorHookLength)
     );
 
     // one hook for each child
@@ -528,9 +534,12 @@ export default class MultiLineFishboneLayoutStrategy extends LinearLayoutStrateg
         i < iterator.FromIndex + iterator.Count;
         i++
       ) {
-        let to = isLeft
-          ? node.Children[i].State.Right
-          : node.Children[i].State.Left;
+        let to =
+          this.ConnectorAlignment === ConnectorAlignment.Center
+            ? node.Children[i].State.CenterH
+            : isLeft
+            ? node.Children[i].State.Right
+            : node.Children[i].State.Left;
         let y = node.Children[i].State.CenterV;
         segments[ix++] = new Edge(new Point(from, y), new Point(to, y));
 

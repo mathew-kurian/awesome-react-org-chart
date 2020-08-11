@@ -1,16 +1,15 @@
 import LinearLayoutStrategy from "./LinearLayoutStrategy";
-import LayoutStrategyBase from "./LayoutStrategyBase";
 import LayoutState from "./LayoutState";
 import Node from "./Node";
 import Box from "./Box";
 import LayoutLevel from "./LayoutLevel";
 import Dimensions from "./Dimensions";
 import LayoutAlgorithm from "./LayoutAlgorithm";
-import BranchParentAlignment from "./BranchParentAlignment";
 import Edge from "./Edge";
 import Point from "./Point";
 import Connector from "./Connector";
 import Rect from "./Rect";
+import ConnectorAlignment from "./ConnectorAlignment";
 
 /// <summary>
 /// Arranges child boxes in multiple lines under the parent.
@@ -333,16 +332,20 @@ export default class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy 
 
     let rootRect = node.State;
     let center = rootRect.CenterH;
+    const rootRectV =
+      this.ConnectorAlignment === ConnectorAlignment.Center
+        ? rootRect.CenterV
+        : rootRect.Bottom;
 
     let verticalCarrierHeight =
       node.Children[node.State.NumberOfSiblings - 1].State.SiblingsRowV.From -
       this.ChildConnectorHookLength -
-      rootRect.Bottom;
+      rootRectV;
 
     // central mid-sibling vertical connector, from parent to last row
     segments[0] = new Edge(
-      new Point(center, rootRect.Bottom),
-      new Point(center, rootRect.Bottom + verticalCarrierHeight)
+      new Point(center, rootRectV),
+      new Point(center, rootRectV + verticalCarrierHeight)
     );
 
     // short hook for each child
@@ -352,9 +355,13 @@ export default class MultiLineHangerLayoutStrategy extends LinearLayoutStrategy 
       if (!child.Element.IsSpecial) {
         let childRect = child.State;
         let childCenter = childRect.CenterH;
+        let childRectV =
+          this.ConnectorAlignment === ConnectorAlignment.Center
+            ? childRect.CenterV
+            : childRect.Top;
         segments[ix++] = new Edge(
-          new Point(childCenter, childRect.Top),
-          new Point(childCenter, childRect.Top - this.ChildConnectorHookLength)
+          new Point(childCenter, childRectV),
+          new Point(childCenter, childRectV - this.ChildConnectorHookLength)
         );
       }
     }
