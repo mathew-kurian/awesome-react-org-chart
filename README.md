@@ -4,39 +4,32 @@
 
 Supports large organization charts with multiple compaction/packing techniques to improve readability and accessibility.
 
-## [Example](https://mathew-kurian.github.io/awesome-react-org-chart/)
+## [Example](https://awesome-react-org-chart.vercel.app/example.html)
 
 ![](./screenshot.png)
 
 ```tsx
 import OrgChart from "awesome-react-org-chart";
 
-// `Card` class is used for demo purposes
-
 <OrgChart
+  // required
   root={nodes[0]}
-  keyGetter={(node) => String(node.id)}
-  childNodesGetter={(node) =>
-    node.children.map((id: string | number) =>
-      nodes.find((node) => node.id === id)
-    )
-  }
+  isValidNode={this.isValidNode}
+  keyGetter={this.keyGetter}
+  renderNode={this.renderNode}
+  childNodesGetter={this.childNodesGetter}
+  // optional (but recommended)
+  lineHorizontalStyle={this.lineHorizontalStyle}
+  lineVerticalStyle={this.lineVerticalStyle}
+  // optional
+  measureStrategy="effect"
+  connectorAlignment={ConnectorAlignment.Center}
+  isAssistantGetter={this.isAssistantGetter} // wip
   layout={layout}
-  connectorHorizontalStyle={{ borderTop: "1px solid red" }}
-  connectorVerticalStyle={{ borderLeft: "1px solid red" }}
-  sizeGetter={(node, domElement) => domElement.getBoundingClientRect()}
-  containerStyle={{ margin: "0 auto" }}
-  renderNode={(node) => (
-    <Card style={{ width: "18rem" }}>
-      <Card.Body>
-        <Card.Title>ID #{node.name}</Card.Title>
-        <Card.Text>
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-        </Card.Text>
-      </Card.Body>
-    </Card>
-  )}
+  containerStyle={this.containerStyle}
+  renderNodeContainer={this.renderNodeContainer}
+  renderNodeLine={this.renderNodeLine}
+  debug={debug}
 />;
 ```
 
@@ -46,7 +39,7 @@ The OrgChart uses `transform3d` to position items on the screen. CSS transitions
 
 ![](./animation.gif)
 
-## No React? [Example!](https://mathew-kurian.github.io/awesome-react-org-chart/public/vanilla.html)
+## No React? [Example!](https://awesome-react-org-chart.vercel.app/public/vanilla.html)
 
 The OrgChart does not need to use React. Please refer to the `VanillaExample.ts` file in the repo to learn more.
 

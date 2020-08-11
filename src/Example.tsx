@@ -8,6 +8,7 @@ import OrgChart, {
   NodeLineRenderProps,
   NodeLineRenderContext,
   Animated,
+  ConnectorAlignment,
 } from "../lib/";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Grid from "react-fast-grid";
@@ -210,6 +211,7 @@ export default class Example extends Component<{}, ExampleState> {
             lineVerticalStyle={this.lineVerticalStyle}
             // optional
             measureStrategy="effect"
+            connectorAlignment={ConnectorAlignment.Center}
             isAssistantGetter={this.isAssistantGetter} // wip
             layout={layout}
             containerStyle={this.containerStyle}

@@ -1,5 +1,4 @@
-public/scripts/*.map
-public/scripts/*.txt
+public/scripts/
 node_modules/
 .DS_Store
 *.log
