@@ -454,7 +454,6 @@ export default class OrgChart<T> extends React.Component<
     } = props;
 
     const dataSource = OrgChart.getDataSource(props);
-
     const boxContainer = new BoxContainer(dataSource);
     const diagram = new OrgChartDiagram<T>(dataSource);
 
@@ -614,7 +613,6 @@ export default class OrgChart<T> extends React.Component<
   };
 
   componentDidMount = (this.componentDidUpdate = () => {
-
     const { measureStrategy } = this.props;
 
     if (measureStrategy !== "effect") {
@@ -916,7 +914,6 @@ export default class OrgChart<T> extends React.Component<
           )}
         </div>
         <div>
-
           {nodes.map((context) => {
             const {
               rect: { top, left, width, height },
