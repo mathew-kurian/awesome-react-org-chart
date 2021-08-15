@@ -443,25 +443,6 @@ export default class OrgChart<T> extends React.Component<
 
     return { prevProps: props };
   }
-  /*
-  componentWillMount() {
-    const nextState = OrgChart.getDerivedStateFromProps(this.props, this.state);
-
-    // @ts-ignore
-    this.setState(nextState);
-  }
-
-  componentWillReceiveProps(nextProps: OrgChartProps<T>) {
-    if (nextProps !== this.props) {
-      const nextState = OrgChart.getDerivedStateFromProps(
-        nextProps,
-        this.state
-      );
-
-      // @ts-ignore
-      this.setState(nextState);
-    }
-  }*/
 
   private static createDiagram<T>(props: OrgChartProps<T>) {
     const {
@@ -929,7 +910,7 @@ export default class OrgChart<T> extends React.Component<
 
               // props.style = { ...props.style };
               props.style.visibility = visible ? "visible" : "hidden";
-              //props.style.pointerEvents = visible ? "auto" : "none";
+              props.style.pointerEvents = visible ? "auto" : "none";
 
               return <div {...props} />;
             }
@@ -983,7 +964,7 @@ export default class OrgChart<T> extends React.Component<
 
             // props.style = { ...props.style };
             props.style.visibility = visible ? "visible" : "hidden";
-            //props.style.pointerEvents = visible ? "auto" : "none";
+            props.style.pointerEvents = visible ? "auto" : "none";
 
             return <div {...props} />;
           })}
@@ -1002,7 +983,7 @@ export default class OrgChart<T> extends React.Component<
                     top: 0,
                     left: 0,
                     zIndex: 0,
-                    //pointerEvents: "none",
+                    pointerEvents: "none",
                     visibility:
                       drawStage === DrawStage.RENDER ? "visible" : "hidden",
                     background: "rgba(255,0,0,0.1)",
