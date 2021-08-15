@@ -100,8 +100,9 @@ class SingleFishboneLayoutAdapter extends LayoutStrategyBase {
     this.SpecialRoot = new TreeNodeView(
       Box.Special(Box.None, realRoot.Element.Id, true)
     );
-    (this.SpecialRoot.Level = this.RealRoot.Level),
-      (this.SpecialRoot.ParentNode = this.RealRoot);
+
+    this.SpecialRoot.Level = this.RealRoot.Level;
+    this.SpecialRoot.ParentNode = this.RealRoot;
 
     this.SpecialRoot.State.EffectiveLayoutStrategy = this;
 

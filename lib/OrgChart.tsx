@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Diagram,
   BoxContainer,
@@ -179,8 +179,9 @@ const Effect = (props: {
 }): React.ReactElement | null => {
   const { onEffect, children } = props;
 
-  if (typeof React.useEffect === "function" && typeof onEffect === "function") {
-    React.useEffect(onEffect);
+  if (typeof useEffect === "function" && typeof onEffect === "function") {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(onEffect);
   }
 
   return children;
@@ -439,25 +440,6 @@ export default class OrgChart<T> extends React.Component<
     }
 
     return { prevProps: props };
-  }
-
-  componentWillMount() {
-    const nextState = OrgChart.getDerivedStateFromProps(this.props, this.state);
-
-    // @ts-ignore
-    this.setState(nextState);
-  }
-
-  componentWillReceiveProps(nextProps: OrgChartProps<T>) {
-    if (nextProps !== this.props) {
-      const nextState = OrgChart.getDerivedStateFromProps(
-        nextProps,
-        this.state
-      );
-
-      // @ts-ignore
-      this.setState(nextState);
-    }
   }
 
   private static createDiagram<T>(props: OrgChartProps<T>) {
@@ -940,11 +922,7 @@ export default class OrgChart<T> extends React.Component<
               drawStage,
             } = context;
 
-            const isValid = isValidNode(dataId);
-
-            if (!isValid) {
-              return null;
-            }
+            if (!isValidNode(dataId)) return null;
 
             let children = renderNode(data);
 
