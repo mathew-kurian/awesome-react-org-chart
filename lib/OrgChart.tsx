@@ -345,7 +345,6 @@ export default class OrgChart<T> extends React.Component<
       });
 
       for (const childNode of childNodesGetter(node)) {
-         console.log(`process child node `,node)
         processNode(childNode, key);
       }
     };
@@ -929,7 +928,6 @@ export default class OrgChart<T> extends React.Component<
 
             if (!isValidNode(dataId)) return null;
 
-            console.log("render node",nodes.length, data);
             let children = renderNode(data);
 
             if (
