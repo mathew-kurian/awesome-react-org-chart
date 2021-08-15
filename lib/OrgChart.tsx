@@ -408,7 +408,6 @@ export default class OrgChart<T> extends React.Component<
     }
 
     return "hanger4";
-
   }
 
   componentWillUnmount() {
