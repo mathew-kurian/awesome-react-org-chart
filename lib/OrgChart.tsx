@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Diagram,
   BoxContainer,
@@ -179,8 +179,9 @@ const Effect = (props: {
 }): React.ReactElement | null => {
   const { onEffect, children } = props;
 
-  if (typeof React.useEffect === "function" && typeof onEffect === "function") {
-    React.useEffect(onEffect);
+  if (typeof useEffect === "function" && typeof onEffect === "function") {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(onEffect);
   }
 
   return children;
@@ -344,6 +345,7 @@ export default class OrgChart<T> extends React.Component<
       });
 
       for (const childNode of childNodesGetter(node)) {
+         console.log(`process child node `,node)
         processNode(childNode, key);
       }
     };
@@ -407,6 +409,7 @@ export default class OrgChart<T> extends React.Component<
     }
 
     return "hanger4";
+
   }
 
   componentWillUnmount() {
@@ -440,7 +443,7 @@ export default class OrgChart<T> extends React.Component<
 
     return { prevProps: props };
   }
-
+  /*
   componentWillMount() {
     const nextState = OrgChart.getDerivedStateFromProps(this.props, this.state);
 
@@ -458,7 +461,7 @@ export default class OrgChart<T> extends React.Component<
       // @ts-ignore
       this.setState(nextState);
     }
-  }
+  }*/
 
   private static createDiagram<T>(props: OrgChartProps<T>) {
     const {
@@ -471,6 +474,7 @@ export default class OrgChart<T> extends React.Component<
     } = props;
 
     const dataSource = OrgChart.getDataSource(props);
+
     const boxContainer = new BoxContainer(dataSource);
     const diagram = new OrgChartDiagram<T>(dataSource);
 
@@ -630,6 +634,7 @@ export default class OrgChart<T> extends React.Component<
   };
 
   componentDidMount = (this.componentDidUpdate = () => {
+
     const { measureStrategy } = this.props;
 
     if (measureStrategy !== "effect") {
@@ -924,13 +929,14 @@ export default class OrgChart<T> extends React.Component<
 
               // props.style = { ...props.style };
               props.style.visibility = visible ? "visible" : "hidden";
-              props.style.pointerEvents = visible ? "auto" : "none";
+              //props.style.pointerEvents = visible ? "auto" : "none";
 
               return <div {...props} />;
             }
           )}
         </div>
         <div>
+
           {nodes.map((context) => {
             const {
               rect: { top, left, width, height },
@@ -940,12 +946,9 @@ export default class OrgChart<T> extends React.Component<
               drawStage,
             } = context;
 
-            const isValid = isValidNode(dataId);
+            if (!isValidNode(dataId)) return null;
 
-            if (!isValid) {
-              return null;
-            }
-
+            console.log("render node",nodes.length, data);
             let children = renderNode(data);
 
             if (
@@ -980,7 +983,7 @@ export default class OrgChart<T> extends React.Component<
 
             // props.style = { ...props.style };
             props.style.visibility = visible ? "visible" : "hidden";
-            props.style.pointerEvents = visible ? "auto" : "none";
+            //props.style.pointerEvents = visible ? "auto" : "none";
 
             return <div {...props} />;
           })}
@@ -999,7 +1002,7 @@ export default class OrgChart<T> extends React.Component<
                     top: 0,
                     left: 0,
                     zIndex: 0,
-                    pointerEvents: "none",
+                    //pointerEvents: "none",
                     visibility:
                       drawStage === DrawStage.RENDER ? "visible" : "hidden",
                     background: "rgba(255,0,0,0.1)",
